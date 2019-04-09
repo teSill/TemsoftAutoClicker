@@ -9,14 +9,16 @@ namespace TemseiAutoClicker {
 
     public partial class Application : Form {
 
-        private ClickThreadHelper clickThreadHelper = new ClickThreadHelper();
+        private LeftClickingThread clickThreadHelper = new LeftClickingThread();
         private GlobalHotkey ghk;
-        private Thread ClickThread;
+        private Thread LeftClickThread;
+        private Thread RightClickThread;
 
         private bool leftClicking = true;
         private bool multiClicking = false;
-        private float clickSpeed = 0;
         private bool randomizeClickSpeed = false;
+        private float leftClickingSpeed = 0;
+        private float rightClickingSpeed = 0;
 
         private void Run() {
             if (button1.BackColor != Color.Green) {
@@ -25,9 +27,20 @@ namespace TemseiAutoClicker {
             }
             try {
                 this.WindowState = FormWindowState.Minimized;
-                ClickThreadHelper helper = new ClickThreadHelper() { ClickSpeed = clickSpeed, LeftClicking = leftClicking, MultiClicking = multiClicking, Randomize = randomizeClickSpeed};
-                ClickThread = new Thread(new ThreadStart(helper.Run));
-                ClickThread.Start();
+                LeftClickingThread leftClickThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed};
+                RightClickingThread rightClickThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed};
+                if (multiClicking) {
+                    LeftClickThread = new Thread(new ThreadStart(leftClickThread.Run));
+                    LeftClickThread.Start();
+                    RightClickThread = new Thread(new ThreadStart(rightClickThread.Run));
+                    RightClickThread.Start();
+                } else if (leftClicking) {
+                    LeftClickThread = new Thread(new ThreadStart(leftClickThread.Run));
+                    LeftClickThread.Start();
+                } else {
+                    RightClickThread = new Thread(new ThreadStart(rightClickThread.Run));
+                    RightClickThread.Start();
+                }
             } catch (Exception exc) {
                 MessageBox.Show("Error in the Main method", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
             }
@@ -35,13 +48,16 @@ namespace TemseiAutoClicker {
 
         private void Stop() {
             try {
-                if (ClickThread.IsAlive) {
-                    ClickThread.Abort();
-                    ClickThread.Join();
-                    ClickThread = null;
-                    //MessageBox.Show("Auto clicking successfully stopped", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //SetButtonColor(Color.Red);
-                    this.WindowState = FormWindowState.Normal;
+                this.WindowState = FormWindowState.Normal;
+                if (LeftClickThread != null && LeftClickThread.IsAlive) {
+                    LeftClickThread.Abort();
+                    LeftClickThread.Join();
+                    LeftClickThread = null;
+                }
+                if (RightClickThread != null && RightClickThread.IsAlive) {
+                    RightClickThread.Abort();
+                    RightClickThread.Join();
+                    RightClickThread = null;
                 }
             } catch (ThreadAbortException ex) {
                 MessageBox.Show("Error stopping the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -53,9 +69,10 @@ namespace TemseiAutoClicker {
         }
 
         private void readyButtonClick(object sender, EventArgs e) {
-            if (!float.TryParse(comboBox1.Text, out clickSpeed)) {
+            if ((leftClicking && !float.TryParse(comboBox1.Text, out leftClickingSpeed)) || (!leftClicking && !float.TryParse(comboBox2.Text, out rightClickingSpeed) 
+                || multiClicking && !float.TryParse(comboBox1.Text, out leftClickingSpeed) && !float.TryParse(comboBox2.Text, out rightClickingSpeed))) {
                 SetButtonColor(Color.Red);
-                MessageBox.Show("Please remove any invalid characters from the click interval text box. JMOI DEBUG: " + comboBox1.Text, "Error");
+                MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
                 return;
             }
             if (!radioButton1.Checked && !radioButton2.Checked && !radioButton3.Checked) {
@@ -63,13 +80,13 @@ namespace TemseiAutoClicker {
                 MessageBox.Show("Please select your desired mouse clicks.", "Error");
                 return;
             }
-            if (clickSpeed <= 0) {
+            if (leftClickingSpeed <= 0) {
                 SetButtonColor(Color.Red);
                 MessageBox.Show("Please set your mouse click interval!", "Error");
                 return;
             }
             SetButtonColor(Color.Green);
-            MessageBox.Show("You're ready to start auto clicking at an interval of " + clickSpeed + " seconds. Press your assigned hotkey to run and stop the application.", "Success");
+            MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application.", "Success");
         }
 
         private void Application_Load(object sender, EventArgs e) {
@@ -78,6 +95,7 @@ namespace TemseiAutoClicker {
                 System.Windows.Forms.Application.Exit();
             }
             comboBox1.SelectedIndex = 1;
+            comboBox2.SelectedIndex = 2;
             textBox1.ReadOnly = true;
             button1.BackColor = Color.Red;
             ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
@@ -87,7 +105,7 @@ namespace TemseiAutoClicker {
         }
 
         private void HandleHotkey() {
-            if (ClickThread != null) {
+            if (LeftClickThread != null || RightClickThread != null) {
                 Stop();
             } else {
                 Run();
@@ -114,9 +132,18 @@ namespace TemseiAutoClicker {
             multiClicking = !multiClicking;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) {
+        private void LeftClickIntervalBox_SelectedIndexChanged(object sender, EventArgs e) {
             SetButtonColor(Color.Red);
-            if (!float.TryParse(comboBox1.Text, out clickSpeed)) {
+            if (!float.TryParse(comboBox1.Text, out leftClickingSpeed)) {
+                SetButtonColor(Color.Red);
+                MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
+                return;
+            }
+        }
+
+        private void RightClickIntervalBox_SelectedIndexChanged(object sender, EventArgs e) {
+            SetButtonColor(Color.Red);
+            if (!float.TryParse(comboBox2.Text, out rightClickingSpeed)) {
                 SetButtonColor(Color.Red);
                 MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
                 return;
