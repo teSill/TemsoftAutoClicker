@@ -4,6 +4,6 @@
 
 Direct download to the executable can be found here: https://github.com/teSill/AutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
-The auto clicker supports left clicking, right clicking and simultaneous clicking of them both. The mouse clicks are handled on separate threads and therefore their click intervals can be set separately.
+Enjoy a very light, traditional auto clicker that supports left clicking, right clicking and simultaneous clicking of them both. The mouse clicks are handled on separate threads and therefore their click intervals can be set separately.
 
 Written in C# in Visual Studio 2017
