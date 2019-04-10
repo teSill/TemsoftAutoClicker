@@ -253,6 +253,7 @@ namespace TemseiAutoClicker {
         private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e) {
             if (!registeringClickPosition)
                 return;
+            e.Handled = true;
             RegisterNewClickPosition(e.X, e.Y, e.Button);
         }
 

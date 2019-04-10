@@ -20,12 +20,12 @@ namespace TemseiAutoClicker {
             try {
                 while(true) {
                     foreach(ClickPosition click in ClickPositions) {
+                        mouseClickHandler.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
                         if (click.GetMouseClickType() == MouseButtons.Left) {
                             Thread.Sleep((int) (mouseClickHandler.GetRandomizedClickSpeed(Randomize, LeftClickSpeed, RandomizationAmount) * 1000));
                         } else {
                             Thread.Sleep((int) (mouseClickHandler.GetRandomizedClickSpeed(Randomize, RightClickSpeed, RandomizationAmount) * 1000));
                         }
-                        mouseClickHandler.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
                     }
                 }
             } catch (Exception exc){
