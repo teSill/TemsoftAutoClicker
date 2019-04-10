@@ -238,7 +238,7 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(341, 126);
+            this.button3.Location = new System.Drawing.Point(341, 130);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(84, 31);
             this.button3.TabIndex = 3;
@@ -261,11 +261,11 @@
             // 
             this.textBox2.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.Location = new System.Drawing.Point(44, 18);
+            this.textBox2.Location = new System.Drawing.Point(44, 12);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(369, 66);
+            this.textBox2.Size = new System.Drawing.Size(369, 94);
             this.textBox2.TabIndex = 2;
             this.textBox2.Text = resources.GetString("textBox2.Text");
             this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -273,7 +273,7 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(138, 112);
+            this.listBox1.Location = new System.Drawing.Point(138, 116);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(172, 69);
             this.listBox1.TabIndex = 1;
@@ -281,7 +281,7 @@
             // button5
             // 
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(26, 129);
+            this.button5.Location = new System.Drawing.Point(26, 133);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(84, 28);
             this.button5.TabIndex = 0;
