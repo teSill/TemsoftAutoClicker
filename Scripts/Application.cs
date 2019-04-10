@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gma.System.MouseKeyHook;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -7,17 +9,32 @@ using System.Windows.Forms;
 
 namespace TemseiAutoClicker {
 
+    enum ClickType {
+        Left,
+        Right,
+        Multi,
+        Custom
+    }
+
     public partial class Application : Form {
+
         private GlobalHotkey ghk;
+
         private Thread LeftClickThread;
         private Thread RightClickThread;
+        private Thread CustomClickThread;
 
-        private bool leftClicking = true;
-        private bool multiClicking = false;
         private bool randomizeClickSpeed = false;
         private int randomizationAmount;
         private float leftClickingSpeed = 0;
         private float rightClickingSpeed = 0;
+
+        private bool registeringClickPosition = false;
+        private List<ClickPosition> clickPositions = new List<ClickPosition>();
+        private const int maxClickPositions = 5;
+
+        private IKeyboardMouseEvents m_GlobalHook;
+        private ClickType clickType = ClickType.Left;
 
         private void Run() {
             if (button1.BackColor != Color.Green) {
@@ -25,15 +42,23 @@ namespace TemseiAutoClicker {
                 return;
             }
             try {
+                Console.WriteLine(clickType);
                 this.WindowState = FormWindowState.Minimized;
                 LeftClickingThread leftClickingThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
                 RightClickingThread rightClickingThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
-                if (multiClicking) {
+                CustomClickingThread customClickingThread = new CustomClickingThread() {
+                        LeftClickSpeed = leftClickingSpeed, RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed,
+                        RandomizationAmount = randomizationAmount, ClickPositions = clickPositions
+                    };
+                if (clickType == ClickType.Custom) {
+                    CustomClickThread = new Thread(new ThreadStart(customClickingThread.Run));
+                    CustomClickThread.Start();
+                } else if (clickType == ClickType.Multi) {
                     LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
                     RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
                     LeftClickThread.Start();
                     RightClickThread.Start();
-                } else if (leftClicking) {
+                } else if (clickType == ClickType.Left) {
                     LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
                     LeftClickThread.Start();
                 } else {
@@ -52,11 +77,14 @@ namespace TemseiAutoClicker {
                     LeftClickThread.Abort();
                     LeftClickThread.Join();
                     LeftClickThread = null;
-                }
-                if (RightClickThread != null && RightClickThread.IsAlive) {
+                } else if (RightClickThread != null && RightClickThread.IsAlive) {
                     RightClickThread.Abort();
                     RightClickThread.Join();
                     RightClickThread = null;
+                } else if (CustomClickThread != null && CustomClickThread.IsAlive) {
+                    CustomClickThread.Abort();
+                    CustomClickThread.Join();
+                    CustomClickThread = null;
                 }
             } catch (ThreadAbortException ex) {
                 MessageBox.Show("Error stopping the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -67,21 +95,17 @@ namespace TemseiAutoClicker {
             InitializeComponent();
         }
 
-        private void readyButtonClick(object sender, EventArgs e) {
-            if ((leftClicking && !float.TryParse(comboBox1.Text, out leftClickingSpeed)) || (!leftClicking && !float.TryParse(comboBox2.Text, out rightClickingSpeed) 
-                || multiClicking && !float.TryParse(comboBox1.Text, out leftClickingSpeed) && !float.TryParse(comboBox2.Text, out rightClickingSpeed))) {
+        private void ReadyButton_Click(object sender, EventArgs e) {
+            if ((clickType == ClickType.Left && !float.TryParse(comboBox1.Text, out leftClickingSpeed)) || 
+                (clickType == ClickType.Right && !float.TryParse(comboBox2.Text, out rightClickingSpeed) 
+                || clickType == ClickType.Multi && !float.TryParse(comboBox1.Text, out leftClickingSpeed) && !float.TryParse(comboBox2.Text, out rightClickingSpeed))) {
                 SetButtonColor(Color.Red);
-                MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
+                MessageBox.Show("Please remove any invalid characters from the click interval text box!", "Error");
                 return;
             }
-            if (!radioButton1.Checked && !radioButton2.Checked && !radioButton3.Checked) {
+            if (leftClickingSpeed <= 0 && rightClickingSpeed <= 0) {
                 SetButtonColor(Color.Red);
-                MessageBox.Show("Please select your desired mouse clicks.", "Error");
-                return;
-            }
-            if (leftClickingSpeed <= 0) {
-                SetButtonColor(Color.Red);
-                MessageBox.Show("Please set your mouse click interval!", "Error");
+                MessageBox.Show("Please set your mouse clicking speed!", "Error");
                 return;
             }
             if (randomizeClickSpeed) {
@@ -93,12 +117,13 @@ namespace TemseiAutoClicker {
             SetButtonColor(Color.Green);
             MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application.", "Success");
         }
-
         private void Application_Load(object sender, EventArgs e) {
             if (IsAlreadyRunning()) {
                 MessageBox.Show("Application is already running.");
                 System.Windows.Forms.Application.Exit();
             }
+            m_GlobalHook = Hook.GlobalEvents();
+            m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
             comboBox1.SelectedIndex = 1;
             comboBox2.SelectedIndex = 2;
             comboBox3.SelectedIndex = 2;
@@ -107,12 +132,12 @@ namespace TemseiAutoClicker {
             button1.BackColor = Color.Red;
             ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
             if (!ghk.Register()) {
-                MessageBox.Show("Couldn't register new hotkey!", "Error");
+                //MessageBox.Show("Couldn't register new hotkey!", "Error");
             }
         }
 
         private void HandleHotkey() {
-            if (LeftClickThread != null || RightClickThread != null) {
+            if (LeftClickThread != null || RightClickThread != null || CustomClickThread != null) {
                 Stop();
             } else {
                 Run();
@@ -125,26 +150,32 @@ namespace TemseiAutoClicker {
             base.WndProc(ref m);
         }
 
-        private void leftClickButton_CheckedChanged(object sender, EventArgs e) {
+        private void LeftClickButton_CheckedChanged(object sender, EventArgs e) {
+            if (clickType == ClickType.Left)
+                return;
             SetButtonColor(Color.Red);
-            leftClicking = true;
+            clickType = ClickType.Left;
         }
 
-        private void rightClickButton_CheckedChanged(object sender, EventArgs e) {
+        private void RightClickButton_CheckedChanged(object sender, EventArgs e) {
             SetButtonColor(Color.Red);
-            leftClicking = false;
+            clickType = ClickType.Right;
         }
 
-        private void bothButton_CheckedChanged(object sender, EventArgs e) {
-            multiClicking = !multiClicking;
+        private void BothButton_CheckedChanged(object sender, EventArgs e) {
+            SetButtonColor(Color.Red);
+            clickType = ClickType.Multi;
+        }
+
+        private void CustomButton_CheckedChanged(object sender, EventArgs e) {
+            SetButtonColor(Color.Red);
+            clickType = ClickType.Custom;
         }
 
         private void LeftClickIntervalBox_SelectedIndexChanged(object sender, EventArgs e) {
             SetButtonColor(Color.Red);
             if (!float.TryParse(comboBox1.Text, out leftClickingSpeed)) {
                 SetButtonColor(Color.Red);
-                MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
-                return;
             }
         }
 
@@ -152,12 +183,10 @@ namespace TemseiAutoClicker {
             SetButtonColor(Color.Red);
             if (!float.TryParse(comboBox2.Text, out rightClickingSpeed)) {
                 SetButtonColor(Color.Red);
-                MessageBox.Show("Please remove any invalid characters from the click interval text box.", "Error");
-                return;
             }
         }
 
-        private void hotKeyTextBox_KeyDown(object sender, KeyEventArgs e) {
+        private void HotKeyTextBox_KeyDown(object sender, KeyEventArgs e) {
             SetButtonColor(Color.Red);
             if (e.KeyValue >= 0x41 && e.KeyValue <= 0x5A) { // Letters only
                 ghk.Unregister();
@@ -169,8 +198,9 @@ namespace TemseiAutoClicker {
             }
         }
 
-        private void randomizeButton_CheckedChanged(object sender, EventArgs e) {
+        private void RandomizeButton_CheckedChanged(object sender, EventArgs e) {
             SetButtonColor(Color.Red);
+            comboBox3.Enabled = !comboBox3.Enabled;
             randomizeClickSpeed = !randomizeClickSpeed;
         }
 
@@ -183,13 +213,59 @@ namespace TemseiAutoClicker {
             string strLoc = Assembly.GetExecutingAssembly().Location;
             FileSystemInfo fileInfo = new FileInfo(strLoc);
             string sExeName = fileInfo.Name;
-            bool bCreatedNew;
 
-            Mutex mutex = new Mutex(true, "Global\\"+sExeName, out bCreatedNew);
+            Mutex mutex = new Mutex(true, "Global\\" + sExeName, out bool bCreatedNew);
             if (bCreatedNew)
                 mutex.ReleaseMutex();
 
             return !bCreatedNew;
+        }
+
+        private void RegisterButton_Click(object sender, EventArgs e) {
+            if (clickPositions.Count >= maxClickPositions) {
+                MessageBox.Show("The list can't hold anymore click positions!", "Error");
+                return;
+            }
+            registeringClickPosition = true;
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void CustomizedClicksButton_Click(object sender, EventArgs e) {
+            advancedSettingsPanel.Visible = true;
+        }
+
+        private void ContinueButton_Click(object sender, EventArgs e) {
+            advancedSettingsPanel.Visible = false;
+            if (clickPositions.Count > 0) {
+                radioButton4.Select();
+            }
+        }
+
+        private void ClearButton_Click(object sender, EventArgs e) {
+            if (clickPositions.Count <= 0) {
+                MessageBox.Show("There are no values in the list to clear!", "Error");
+            } else {
+                clickPositions.Clear();
+                listBox1.Items.Clear();
+            }
+        }
+
+        private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e) {
+            if (!registeringClickPosition)
+                return;
+            RegisterNewClickPosition(e.X, e.Y, e.Button);
+        }
+
+        private void RegisterNewClickPosition(int x, int y, MouseButtons mouseButton) {
+            if (clickPositions.Count >= 5) {
+                this.WindowState = FormWindowState.Normal;
+                return;
+            }
+            registeringClickPosition = false;
+            ClickPosition mouseClick = new ClickPosition(x, y, mouseButton);
+            clickPositions.Add(mouseClick);
+            listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Type: " + mouseClick.GetMouseClickType()); 
+            this.WindowState = FormWindowState.Normal;
         }
     }
 }

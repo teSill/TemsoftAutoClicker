@@ -117,4 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="textBox2.Text" xml:space="preserve">
+    <value>Assign custom clicking positions for the program to iterate over. 
+Usage:
+Click the 'Register' button below this box and the program will minimize. Your next click will be registered and added to the next empty spot in the below list.
+</value>
+  </data>
 </root>

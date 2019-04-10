@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -28,6 +29,17 @@ namespace TemseiAutoClicker {
         public void ClickRightMouseButtonEvent() {
             mouse_event(MOUSEEVENTF_RIGHTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);
             mouse_event(MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+        }
+
+        public void ClickCustomPositionEvent(int x, int y, MouseButtons mouseButton) {
+            Cursor.Position = new Point(x, y);
+            if (mouseButton == MouseButtons.Left) {
+                mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+            } else {
+                mouse_event(MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0);
+                mouse_event(MOUSEEVENTF_RIGHTUP, x, y, 0, 0);
+            }
         }
 
         public double GetRandomizedClickSpeed(bool randomize, float defaultSpeed, float randomizationAmount) {
