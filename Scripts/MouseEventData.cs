@@ -9,6 +9,8 @@ using System.Windows.Forms;
 
 namespace TemseiAutoClicker {
     class MouseEventData {
+
+        static Random random = new Random();
        
         private const int MOUSEEVENTF_LEFTDOWN = 0x0002; /* left button down */
         private const int MOUSEEVENTF_LEFTUP = 0x0004; /* left button up */
@@ -26,6 +28,18 @@ namespace TemseiAutoClicker {
         public void ClickRightMouseButtonEvent() {
             mouse_event(MOUSEEVENTF_RIGHTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);
             mouse_event(MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+        }
+
+        public double GetRandomizedClickSpeed(bool randomize, float defaultSpeed, float randomizationAmount) {
+            if(!randomize)
+                return defaultSpeed;
+            
+            float multiplier = 1 + (randomizationAmount / 100);
+
+            double min = defaultSpeed * multiplier;
+            double max = defaultSpeed / multiplier;
+
+            return random.NextDouble() * (max - min) + min;
         }
     }
 }

@@ -8,8 +8,6 @@ using System.Windows.Forms;
 namespace TemseiAutoClicker {
 
     public partial class Application : Form {
-
-        private LeftClickingThread clickThreadHelper = new LeftClickingThread();
         private GlobalHotkey ghk;
         private Thread LeftClickThread;
         private Thread RightClickThread;
@@ -17,6 +15,7 @@ namespace TemseiAutoClicker {
         private bool leftClicking = true;
         private bool multiClicking = false;
         private bool randomizeClickSpeed = false;
+        private int randomizationAmount;
         private float leftClickingSpeed = 0;
         private float rightClickingSpeed = 0;
 
@@ -27,18 +26,18 @@ namespace TemseiAutoClicker {
             }
             try {
                 this.WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed};
-                RightClickingThread rightClickThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed};
+                LeftClickingThread leftClickingThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
+                RightClickingThread rightClickingThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
                 if (multiClicking) {
-                    LeftClickThread = new Thread(new ThreadStart(leftClickThread.Run));
+                    LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                    RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
                     LeftClickThread.Start();
-                    RightClickThread = new Thread(new ThreadStart(rightClickThread.Run));
                     RightClickThread.Start();
                 } else if (leftClicking) {
-                    LeftClickThread = new Thread(new ThreadStart(leftClickThread.Run));
+                    LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
                     LeftClickThread.Start();
                 } else {
-                    RightClickThread = new Thread(new ThreadStart(rightClickThread.Run));
+                    RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
                     RightClickThread.Start();
                 }
             } catch (Exception exc) {
@@ -85,6 +84,12 @@ namespace TemseiAutoClicker {
                 MessageBox.Show("Please set your mouse click interval!", "Error");
                 return;
             }
+            if (randomizeClickSpeed) {
+                if (!int.TryParse(comboBox3.Text.Remove(comboBox3.Text.Length - 1), out randomizationAmount)) {
+                    MessageBox.Show("There was a problem setting your randomization percentage. Please try again!", "Error");
+                    return;
+                }
+            }
             SetButtonColor(Color.Green);
             MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application.", "Success");
         }
@@ -96,6 +101,8 @@ namespace TemseiAutoClicker {
             }
             comboBox1.SelectedIndex = 1;
             comboBox2.SelectedIndex = 2;
+            comboBox3.SelectedIndex = 2;
+            comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
             textBox1.ReadOnly = true;
             button1.BackColor = Color.Red;
             ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
