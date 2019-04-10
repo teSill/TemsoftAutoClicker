@@ -247,6 +247,7 @@ namespace TemseiAutoClicker {
             } else {
                 clickPositions.Clear();
                 listBox1.Items.Clear();
+                SetButtonColor(Color.Red);
             }
         }
 
