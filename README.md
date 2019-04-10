@@ -1,6 +1,8 @@
 # TemseiAutoClicker
 
-![TemseiAutoClickerInterface](https://user-images.githubusercontent.com/24759016/55832803-06572900-5b1f-11e9-8a50-d6bc14bf0deb.png)
+![TemseiAutoClickerInterface2](https://user-images.githubusercontent.com/24759016/55911093-99a86100-5be8-11e9-930a-dd7bece04c71.png)
+
+![TemseiAutoClickerInterface1](https://user-images.githubusercontent.com/24759016/55911094-99a86100-5be8-11e9-9144-ee5507e89745.png)
 
 Direct download to the executable can be found here: https://github.com/teSill/AutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
