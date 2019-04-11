@@ -12,7 +12,7 @@ This is a very light auto clicker with traditional auto clicker functionalities 
   - Left clicking
   - Right clicking
   - Simultaneous clicking of both left and right mouse clicks
-- Click intervals can be randomized between with a value of 5-100% (eg. a 1 second click interval with a 100% randomization would return a value between 0.5s and 2s)
+- Click intervals can be randomized between with a value between 5-100% (eg. a 1 second click interval with a 100% randomization would return a value between 0.5s and 2s)
 - On top of auto clicking where your mouse currently is, you can also set up to custom click positions which the program will iterate over in order
 
 
