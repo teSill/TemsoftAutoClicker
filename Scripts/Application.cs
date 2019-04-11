@@ -77,11 +77,13 @@ namespace TemseiAutoClicker {
                     LeftClickThread.Abort();
                     LeftClickThread.Join();
                     LeftClickThread = null;
-                } else if (RightClickThread != null && RightClickThread.IsAlive) {
+                }
+                if (RightClickThread != null && RightClickThread.IsAlive) {
                     RightClickThread.Abort();
                     RightClickThread.Join();
                     RightClickThread = null;
-                } else if (CustomClickThread != null && CustomClickThread.IsAlive) {
+                }
+                if (CustomClickThread != null && CustomClickThread.IsAlive) {
                     CustomClickThread.Abort();
                     CustomClickThread.Join();
                     CustomClickThread = null;
@@ -120,7 +122,7 @@ namespace TemseiAutoClicker {
         private void Application_Load(object sender, EventArgs e) {
             if (IsAlreadyRunning()) {
                 MessageBox.Show("Application is already running.");
-                System.Windows.Forms.Application.Exit();
+                System.Windows.Forms.Application.ExitThread();
             }
             m_GlobalHook = Hook.GlobalEvents();
             m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
@@ -268,6 +270,11 @@ namespace TemseiAutoClicker {
             clickPositions.Add(mouseClick);
             listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Type: " + mouseClick.GetMouseClickType()); 
             this.WindowState = FormWindowState.Normal;
+        }
+
+        private void Application_FormClosing_1(object sender, FormClosingEventArgs e) {
+            Stop();
+            System.Windows.Forms.Application.ExitThread();
         }
     }
 }
