@@ -2,7 +2,7 @@
 
 Direct download to the executable can be found here: https://github.com/teSill/AutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
-![TemseiAutoClickerInterface1](https://user-images.githubusercontent.com/24759016/55911094-99a86100-5be8-11e9-9144-ee5507e89745.png)
+![TemseiAutoClicker](https://user-images.githubusercontent.com/24759016/55986921-1864d300-5ca9-11e9-968e-6d3d59c243b8.png)
 
 ![TemseiAutoClickerInterface2](https://user-images.githubusercontent.com/24759016/55911093-99a86100-5be8-11e9-930a-dd7bece04c71.png)
 
