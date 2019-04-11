@@ -13,13 +13,20 @@ namespace TemseiAutoClicker {
 
         static Random random = new Random();
        
-        private const int MOUSEEVENTF_LEFTDOWN = 0x0002; /* left button down */
-        private const int MOUSEEVENTF_LEFTUP = 0x0004; /* left button up */
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x0008; /* right button down */
+        private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+        private const int MOUSEEVENTF_LEFTUP = 0x0004; 
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
         private const int MOUSEEVENTF_RIGHTUP = 0x0010;
 
+        public const int KEYEVENTF_KEYUP = 0x02;
+        public const int VK_CONTROL = 0x11;
+
         [DllImport("user32.dll", CharSet = CharSet.Auto,CallingConvention=CallingConvention.StdCall)]
-        public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+        private static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+
+        [DllImport("user32.dll", SetLastError = true)] 
+        public static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
 
         public void ClickLeftMouseButtonEvent() {
             mouse_event(MOUSEEVENTF_LEFTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);

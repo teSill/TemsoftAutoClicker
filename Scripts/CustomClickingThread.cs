@@ -8,7 +8,8 @@ using System.Windows.Forms;
 
 namespace TemseiAutoClicker {
     class CustomClickingThread {
-        MouseEventData mouseClickHandler = new MouseEventData();
+
+        MouseEventData mouseEvents = new MouseEventData();
         
         public float LeftClickSpeed { get; internal set; }
         public float RightClickSpeed { get; internal set; }
@@ -20,11 +21,11 @@ namespace TemseiAutoClicker {
             try {
                 while(true) {
                     foreach(ClickPosition click in ClickPositions) {
-                        mouseClickHandler.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
+                        mouseEvents.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
                         if (click.GetMouseClickType() == MouseButtons.Left) {
-                            Thread.Sleep((int) (mouseClickHandler.GetRandomizedClickSpeed(Randomize, LeftClickSpeed, RandomizationAmount) * 1000));
+                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(Randomize, LeftClickSpeed, RandomizationAmount) * 1000));
                         } else {
-                            Thread.Sleep((int) (mouseClickHandler.GetRandomizedClickSpeed(Randomize, RightClickSpeed, RandomizationAmount) * 1000));
+                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(Randomize, RightClickSpeed, RandomizationAmount) * 1000));
                         }
                     }
                 }

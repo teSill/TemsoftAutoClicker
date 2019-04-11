@@ -36,6 +36,8 @@ namespace TemseiAutoClicker {
         private IKeyboardMouseEvents m_GlobalHook;
         private ClickType clickType = ClickType.Left;
 
+        private bool holdCtrl = false; // Not used in the main version and will never be set to true
+
         private void Run() {
             if (button1.BackColor != Color.Green) {
                 MessageBox.Show("Please click the Ready button to confirm your settings!");
@@ -44,7 +46,7 @@ namespace TemseiAutoClicker {
             try {
                 Console.WriteLine(clickType);
                 this.WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickingThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
+                LeftClickingThread leftClickingThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount, HoldCtrl = holdCtrl};
                 RightClickingThread rightClickingThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
                 CustomClickingThread customClickingThread = new CustomClickingThread() {
                         LeftClickSpeed = leftClickingSpeed, RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed,
@@ -88,6 +90,8 @@ namespace TemseiAutoClicker {
                     CustomClickThread.Join();
                     CustomClickThread = null;
                 }
+                if(holdCtrl)
+                    MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
                 MessageBox.Show("Error stopping the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -275,6 +279,11 @@ namespace TemseiAutoClicker {
         private void Application_FormClosing_1(object sender, FormClosingEventArgs e) {
             Stop();
             System.Windows.Forms.Application.ExitThread();
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e) {
+            SetButtonColor(Color.Red);
+            holdCtrl = !holdCtrl;
         }
     }
 }
