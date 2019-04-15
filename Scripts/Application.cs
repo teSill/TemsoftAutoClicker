@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -36,39 +37,40 @@ namespace TemseiAutoClicker {
         private IKeyboardMouseEvents m_GlobalHook;
         private ClickType clickType = ClickType.Left;
 
-        private bool holdCtrl = false; // Not used in the main version and will never be set to true
+        private bool holdCTRL = false; // Not used in the main version and will never be set to true
 
         private void Run() {
-            if (button1.BackColor != Color.Green) {
+            if (!IsReady()) {
                 MessageBox.Show("Please click the Ready button to confirm your settings!");
                 return;
             }
             try {
-                Console.WriteLine(clickType);
                 this.WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickingThread = new LeftClickingThread() { LeftClickSpeed = leftClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount, HoldCtrl = holdCtrl};
-                RightClickingThread rightClickingThread = new RightClickingThread() { RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed, RandomizationAmount = randomizationAmount};
-                CustomClickingThread customClickingThread = new CustomClickingThread() {
-                        LeftClickSpeed = leftClickingSpeed, RightClickSpeed = rightClickingSpeed, Randomize = randomizeClickSpeed,
-                        RandomizationAmount = randomizationAmount, ClickPositions = clickPositions
-                    };
-                if (clickType == ClickType.Custom) {
-                    CustomClickThread = new Thread(new ThreadStart(customClickingThread.Run));
-                    CustomClickThread.Start();
-                } else if (clickType == ClickType.Multi) {
-                    LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                    RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                    LeftClickThread.Start();
-                    RightClickThread.Start();
-                } else if (clickType == ClickType.Left) {
-                    LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                    LeftClickThread.Start();
-                } else {
-                    RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                    RightClickThread.Start();
+                LeftClickingThread leftClickingThread = new LeftClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
+                RightClickingThread rightClickingThread = new RightClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount);
+                CustomClickingThread customClickingThread = new CustomClickingThread(leftClickingSpeed, rightClickingSpeed, randomizeClickSpeed, randomizationAmount, clickPositions);
+                switch(clickType) {
+                    case ClickType.Custom:
+                        CustomClickThread = new Thread(new ThreadStart(customClickingThread.Run));
+                        CustomClickThread.Start();
+                        break;
+                    case ClickType.Multi:
+                        LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        LeftClickThread.Start();
+                        RightClickThread.Start();
+                        break;
+                    case ClickType.Left:
+                        LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        LeftClickThread.Start();
+                        break;
+                    case ClickType.Right:
+                        RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        RightClickThread.Start();
+                        break;
                 }
             } catch (Exception exc) {
-                MessageBox.Show("Error in the Main method", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                MessageBox.Show("Error in the main method!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
             }
         }
 
@@ -90,7 +92,7 @@ namespace TemseiAutoClicker {
                     CustomClickThread.Join();
                     CustomClickThread = null;
                 }
-                if(holdCtrl)
+                if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
                 MessageBox.Show("Error stopping the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -102,16 +104,11 @@ namespace TemseiAutoClicker {
         }
 
         private void ReadyButton_Click(object sender, EventArgs e) {
-            if ((clickType == ClickType.Left && !float.TryParse(comboBox1.Text, out leftClickingSpeed)) || 
-                (clickType == ClickType.Right && !float.TryParse(comboBox2.Text, out rightClickingSpeed) 
-                || clickType == ClickType.Multi && !float.TryParse(comboBox1.Text, out leftClickingSpeed) && !float.TryParse(comboBox2.Text, out rightClickingSpeed))) {
+            if ((clickType == ClickType.Left && !TryParse(comboBox1, out leftClickingSpeed) || 
+                clickType == ClickType.Right && !TryParse(comboBox2, out rightClickingSpeed) ||
+                clickType == ClickType.Multi && !TryParse(comboBox1, out leftClickingSpeed) && !TryParse(comboBox2, out rightClickingSpeed))) {
                 SetButtonColor(Color.Red);
                 MessageBox.Show("Please remove any invalid characters from the click interval text box!", "Error");
-                return;
-            }
-            if (leftClickingSpeed <= 0 && rightClickingSpeed <= 0) {
-                SetButtonColor(Color.Red);
-                MessageBox.Show("Please set your mouse clicking speed!", "Error");
                 return;
             }
             if (randomizeClickSpeed) {
@@ -120,8 +117,12 @@ namespace TemseiAutoClicker {
                     return;
                 }
             }
+            if (clickType == ClickType.Custom && clickPositions.Count == 0) {
+                MessageBox.Show("Your custom click list is empty! Add some positions for the program to iterate over or choose another clicking mode.", "Error");
+                return;
+            }
             SetButtonColor(Color.Green);
-            MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application.", "Success");
+            MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application. " + leftClickingSpeed + " - " + rightClickingSpeed, "Success");
         }
         private void Application_Load(object sender, EventArgs e) {
             if (IsAlreadyRunning()) {
@@ -133,13 +134,9 @@ namespace TemseiAutoClicker {
             comboBox1.SelectedIndex = 1;
             comboBox2.SelectedIndex = 2;
             comboBox3.SelectedIndex = 2;
-            comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
-            textBox1.ReadOnly = true;
-            button1.BackColor = Color.Red;
+            SetButtonColor(Color.Red);
             ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
-            if (!ghk.Register()) {
-                //MessageBox.Show("Couldn't register new hotkey!", "Error");
-            }
+            ghk.Register();
         }
 
         private void HandleHotkey() {
@@ -174,6 +171,8 @@ namespace TemseiAutoClicker {
         }
 
         private void CustomButton_CheckedChanged(object sender, EventArgs e) {
+            if (clickType != ClickType.Custom)
+                advancedSettingsPanel.Visible = true;
             SetButtonColor(Color.Red);
             clickType = ClickType.Custom;
         }
@@ -242,9 +241,6 @@ namespace TemseiAutoClicker {
 
         private void ContinueButton_Click(object sender, EventArgs e) {
             advancedSettingsPanel.Visible = false;
-            if (clickPositions.Count > 0) {
-                radioButton4.Select();
-            }
         }
 
         private void ClearButton_Click(object sender, EventArgs e) {
@@ -272,7 +268,7 @@ namespace TemseiAutoClicker {
             registeringClickPosition = false;
             ClickPosition mouseClick = new ClickPosition(x, y, mouseButton);
             clickPositions.Add(mouseClick);
-            listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Type: " + mouseClick.GetMouseClickType()); 
+            listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Click Type: " + mouseClick.GetMouseClickType()); 
             this.WindowState = FormWindowState.Normal;
         }
 
@@ -281,9 +277,22 @@ namespace TemseiAutoClicker {
             System.Windows.Forms.Application.ExitThread();
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e) {
+        private void HoldCTRL_CheckedChanged(object sender, EventArgs e) {
             SetButtonColor(Color.Red);
-            holdCtrl = !holdCtrl;
+            holdCTRL = !holdCTRL;
+        }
+
+        private bool TryParse(ComboBox comboBox, out float speed) {
+            if (float.TryParse(comboBox.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out speed)) {
+                return true;
+            }  else if (float.TryParse(comboBox.Text, out speed)) {
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsReady() {
+            return button1.BackColor == Color.Green ? true : false;
         }
     }
 }

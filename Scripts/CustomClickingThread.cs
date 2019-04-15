@@ -11,21 +11,29 @@ namespace TemseiAutoClicker {
 
         MouseEventData mouseEvents = new MouseEventData();
         
-        public float LeftClickSpeed { get; internal set; }
-        public float RightClickSpeed { get; internal set; }
-        public bool Randomize { get; internal set; }
-        public float RandomizationAmount { get; internal set; }
-        public List<ClickPosition> ClickPositions { get; internal set; }
+        private float leftClickSpeed;
+        private float rightClickSpeed;
+        private bool randomize;
+        private float randomizationAmount;
+        private List<ClickPosition> clickPositions;
+
+        public CustomClickingThread(float leftClickSpeed, float rightClickSpeed, bool randomize, float randomizationAmount, List<ClickPosition> clickPositions) {
+            this.leftClickSpeed = leftClickSpeed;
+            this.rightClickSpeed = rightClickSpeed;
+            this.randomize = randomize;
+            this.randomizationAmount = randomizationAmount;
+            this.clickPositions = clickPositions;
+        }
 
         public void Run() {
             try {
                 while(true) {
-                    foreach(ClickPosition click in ClickPositions) {
+                    foreach(ClickPosition click in clickPositions) {
                         mouseEvents.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
                         if (click.GetMouseClickType() == MouseButtons.Left) {
-                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(Randomize, LeftClickSpeed, RandomizationAmount) * 1000));
+                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(randomize, leftClickSpeed, randomizationAmount) * 1000));
                         } else {
-                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(Randomize, RightClickSpeed, RandomizationAmount) * 1000));
+                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(randomize, rightClickSpeed, randomizationAmount) * 1000));
                         }
                     }
                 }

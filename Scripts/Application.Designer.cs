@@ -54,7 +54,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(279, 128);
+            this.button1.Location = new System.Drawing.Point(279, 127);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(146, 35);
             this.button1.TabIndex = 0;
@@ -91,6 +91,7 @@
             // 
             // comboBox1
             // 
+            this.comboBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "0.01",
@@ -103,9 +104,9 @@
             "3",
             "5",
             "10"});
-            this.comboBox1.Location = new System.Drawing.Point(131, 86);
+            this.comboBox1.Location = new System.Drawing.Point(128, 82);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(73, 21);
+            this.comboBox1.Size = new System.Drawing.Size(73, 24);
             this.comboBox1.TabIndex = 6;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.LeftClickIntervalBox_SelectedIndexChanged);
             // 
@@ -113,7 +114,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(18, 86);
+            this.label1.Location = new System.Drawing.Point(15, 82);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(100, 20);
             this.label1.TabIndex = 7;
@@ -123,7 +124,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(342, 61);
+            this.label2.Location = new System.Drawing.Point(340, 53);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 20);
             this.label2.TabIndex = 8;
@@ -132,8 +133,9 @@
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(324, 84);
+            this.textBox1.Location = new System.Drawing.Point(321, 80);
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(100, 26);
             this.textBox1.TabIndex = 9;
             this.textBox1.Text = "CTRL + H";
@@ -166,6 +168,7 @@
             // 
             // comboBox2
             // 
+            this.comboBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Items.AddRange(new object[] {
             "0.01",
@@ -178,9 +181,9 @@
             "3",
             "5",
             "10"});
-            this.comboBox2.Location = new System.Drawing.Point(222, 86);
+            this.comboBox2.Location = new System.Drawing.Point(219, 82);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(73, 21);
+            this.comboBox2.Size = new System.Drawing.Size(73, 24);
             this.comboBox2.TabIndex = 6;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.RightClickIntervalBox_SelectedIndexChanged);
             // 
@@ -188,7 +191,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(152, 65);
+            this.label3.Location = new System.Drawing.Point(142, 56);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 20);
             this.label3.TabIndex = 8;
@@ -198,7 +201,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(241, 65);
+            this.label4.Location = new System.Drawing.Point(232, 56);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(47, 20);
             this.label4.TabIndex = 8;
@@ -206,6 +209,7 @@
             // 
             // comboBox3
             // 
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox3.Enabled = false;
             this.comboBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBox3.FormattingEnabled = true;
@@ -233,17 +237,16 @@
             this.advancedSettingsPanel.Controls.Add(this.textBox2);
             this.advancedSettingsPanel.Controls.Add(this.listBox1);
             this.advancedSettingsPanel.Controls.Add(this.button5);
-            this.advancedSettingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.advancedSettingsPanel.Location = new System.Drawing.Point(0, 0);
             this.advancedSettingsPanel.Name = "advancedSettingsPanel";
-            this.advancedSettingsPanel.Size = new System.Drawing.Size(450, 249);
+            this.advancedSettingsPanel.Size = new System.Drawing.Size(10, 249);
             this.advancedSettingsPanel.TabIndex = 14;
             this.advancedSettingsPanel.Visible = false;
             // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(341, 130);
+            this.button3.Location = new System.Drawing.Point(340, 142);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(84, 31);
             this.button3.TabIndex = 3;
@@ -254,7 +257,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button4.Location = new System.Drawing.Point(180, 199);
+            this.button4.Location = new System.Drawing.Point(179, 211);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(84, 31);
             this.button4.TabIndex = 3;
@@ -278,15 +281,15 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(138, 116);
+            this.listBox1.Location = new System.Drawing.Point(128, 128);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(172, 69);
+            this.listBox1.Size = new System.Drawing.Size(193, 69);
             this.listBox1.TabIndex = 1;
             // 
             // button5
             // 
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(26, 133);
+            this.button5.Location = new System.Drawing.Point(25, 145);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(84, 28);
             this.button5.TabIndex = 0;
@@ -308,9 +311,8 @@
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
-            this.radioButton4.Enabled = false;
             this.radioButton4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton4.Location = new System.Drawing.Point(343, 21);
+            this.radioButton4.Location = new System.Drawing.Point(339, 22);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(82, 24);
             this.radioButton4.TabIndex = 11;

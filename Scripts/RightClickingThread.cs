@@ -6,9 +6,15 @@ namespace TemseiAutoClicker {
 
         MouseEventData mouseEvents = new MouseEventData();
         
-        public float RightClickSpeed { get; internal set; }
-        public bool Randomize { get; internal set; }
-        public float RandomizationAmount { get; internal set; }
+        private float RightClickSpeed;
+        private bool Randomize;
+        private float RandomizationAmount;
+
+        public RightClickingThread(float rightClickSpeed, bool randomize, float randomizationAmount) {
+            this.RightClickSpeed = rightClickSpeed;
+            this.Randomize = randomize;
+            this.RandomizationAmount = randomizationAmount;
+        }
 
         public void Run() {
             try {
