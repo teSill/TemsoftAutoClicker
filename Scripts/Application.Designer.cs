@@ -47,6 +47,7 @@
             this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.label5 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.advancedSettingsPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -237,9 +238,10 @@
             this.advancedSettingsPanel.Controls.Add(this.textBox2);
             this.advancedSettingsPanel.Controls.Add(this.listBox1);
             this.advancedSettingsPanel.Controls.Add(this.button5);
+            this.advancedSettingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.advancedSettingsPanel.Location = new System.Drawing.Point(0, 0);
             this.advancedSettingsPanel.Name = "advancedSettingsPanel";
-            this.advancedSettingsPanel.Size = new System.Drawing.Size(10, 249);
+            this.advancedSettingsPanel.Size = new System.Drawing.Size(450, 249);
             this.advancedSettingsPanel.TabIndex = 14;
             this.advancedSettingsPanel.Visible = false;
             // 
@@ -312,7 +314,7 @@
             // 
             this.radioButton4.AutoSize = true;
             this.radioButton4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton4.Location = new System.Drawing.Point(339, 22);
+            this.radioButton4.Location = new System.Drawing.Point(21, 196);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(82, 24);
             this.radioButton4.TabIndex = 11;
@@ -336,10 +338,22 @@
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.button2);
-            this.panel1.Location = new System.Drawing.Point(80, 179);
+            this.panel1.Location = new System.Drawing.Point(137, 179);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(287, 58);
             this.panel1.TabIndex = 15;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBox2.Location = new System.Drawing.Point(321, 22);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(106, 24);
+            this.checkBox2.TabIndex = 16;
+            this.checkBox2.Text = "Hold CTRL";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.HoldCTRL_CheckedChanged);
             // 
             // Application
             // 
@@ -362,6 +376,7 @@
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.button1);
+            this.Controls.Add(this.checkBox2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview = true;
             this.MaximizeBox = false;
@@ -403,6 +418,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }
 

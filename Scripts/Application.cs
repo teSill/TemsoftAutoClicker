@@ -74,24 +74,23 @@ namespace TemseiAutoClicker {
             }
         }
 
+        private void ShutdownThread(Thread thread) {
+            if (thread != null && thread.IsAlive) {
+                thread.Abort();
+                thread.Join();
+                thread = null;
+            }
+        }
+
         private void Stop() {
             try {
                 this.WindowState = FormWindowState.Normal;
-                if (LeftClickThread != null && LeftClickThread.IsAlive) {
-                    LeftClickThread.Abort();
-                    LeftClickThread.Join();
-                    LeftClickThread = null;
+
+                Thread[] threads = {LeftClickThread, RightClickThread, CustomClickThread};
+                foreach(Thread thread in threads) {
+                    ShutdownThread(thread);
                 }
-                if (RightClickThread != null && RightClickThread.IsAlive) {
-                    RightClickThread.Abort();
-                    RightClickThread.Join();
-                    RightClickThread = null;
-                }
-                if (CustomClickThread != null && CustomClickThread.IsAlive) {
-                    CustomClickThread.Abort();
-                    CustomClickThread.Join();
-                    CustomClickThread = null;
-                }
+
                 if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
@@ -241,6 +240,9 @@ namespace TemseiAutoClicker {
 
         private void ContinueButton_Click(object sender, EventArgs e) {
             advancedSettingsPanel.Visible = false;
+            if (clickPositions.Count > 0) {
+                radioButton4.Checked = true;
+            }
         }
 
         private void ClearButton_Click(object sender, EventArgs e) {
@@ -277,11 +279,6 @@ namespace TemseiAutoClicker {
             System.Windows.Forms.Application.ExitThread();
         }
 
-        private void HoldCTRL_CheckedChanged(object sender, EventArgs e) {
-            SetButtonColor(Color.Red);
-            holdCTRL = !holdCTRL;
-        }
-
         private bool TryParse(ComboBox comboBox, out float speed) {
             if (float.TryParse(comboBox.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out speed)) {
                 return true;
@@ -293,6 +290,11 @@ namespace TemseiAutoClicker {
 
         private bool IsReady() {
             return button1.BackColor == Color.Green ? true : false;
+        }
+
+        private void HoldCTRL_CheckedChanged(object sender, EventArgs e) {
+            SetButtonColor(Color.Red);
+            holdCTRL = !holdCTRL;
         }
     }
 }
