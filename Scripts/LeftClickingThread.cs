@@ -28,6 +28,7 @@ namespace TemseiAutoClicker {
                     if (holdCTRL)
                         MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, 0, 0); // HOLD DOWN CONTROL
                     mouseEvents.ClickLeftMouseButtonEvent();
+                    Console.WriteLine("Speed: " + leftClickSpeed);
                     Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(randomize, leftClickSpeed, randomizationAmount) * 1000));
                 }
             } catch (Exception exc){

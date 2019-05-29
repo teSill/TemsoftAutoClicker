@@ -46,7 +46,7 @@ namespace TemseiAutoClicker {
             }
             try {
                 this.WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickingThread = new LeftClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
+                LeftClickingThread leftClickingThread = new LeftClickingThread(leftClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
                 RightClickingThread rightClickingThread = new RightClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount);
                 CustomClickingThread customClickingThread = new CustomClickingThread(leftClickingSpeed, rightClickingSpeed, randomizeClickSpeed, randomizationAmount, clickPositions);
                 switch(clickType) {
@@ -121,7 +121,7 @@ namespace TemseiAutoClicker {
                 return;
             }
             SetButtonColor(Color.Green);
-            MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application. " + leftClickingSpeed + " - " + rightClickingSpeed, "Success");
+            MessageBox.Show("You're ready to start auto clicking! Press your assigned hotkey to run and stop the application.", "Success");
         }
         private void Application_Load(object sender, EventArgs e) {
             if (IsAlreadyRunning()) {
