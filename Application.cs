@@ -34,17 +34,21 @@ namespace TemseiAutoClicker {
         private List<ClickPosition> clickPositions = new List<ClickPosition>();
         private const int maxClickPositions = 5;
 
+        private bool isRunning = false;
+
         private IKeyboardMouseEvents m_GlobalHook;
         private ClickType clickType = ClickType.Left;
 
         private bool holdCTRL = false; // Not used in the main version and will never be set to true
 
         private void Run() {
+            Console.WriteLine("Yes hello. " + clickType);
             if (!IsReady()) {
                 MessageBox.Show("Please click the Ready button to confirm your settings!");
                 return;
             }
             try {
+                isRunning = true;
                 this.WindowState = FormWindowState.Minimized;
                 LeftClickingThread leftClickingThread = new LeftClickingThread(leftClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
                 RightClickingThread rightClickingThread = new RightClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount);
@@ -90,6 +94,8 @@ namespace TemseiAutoClicker {
                 foreach(Thread thread in threads) {
                     ShutdownThread(thread);
                 }
+
+                isRunning = false;
 
                 if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
@@ -139,7 +145,7 @@ namespace TemseiAutoClicker {
         }
 
         private void HandleHotkey() {
-            if (LeftClickThread != null || RightClickThread != null || CustomClickThread != null) {
+            if (isRunning) {
                 Stop();
             } else {
                 Run();

@@ -1,0 +1,10 @@
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\bin\Debug\TemseiAutoClicker.exe.config
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\bin\Debug\TemseiAutoClicker.exe
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\bin\Debug\TemseiAutoClicker.pdb
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.Application.resources
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.Properties.Resources.resources
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.csproj.GenerateResource.cache
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.csproj.CoreCompileInputs.cache
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.csproj.Fody.CopyLocal.cache
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.exe
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Debug\TemseiAutoClicker.pdb
