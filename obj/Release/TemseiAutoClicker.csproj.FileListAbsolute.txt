@@ -8,3 +8,4 @@ C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\
 C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Release\TemseiAutoClicker.csproj.Fody.CopyLocal.cache
 C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Release\TemseiAutoClicker.exe
 C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Release\TemseiAutoClicker.pdb
+C:\Users\teemu\OneDrive\Tiedostot\Visual Studio 2017\Projects\TemseiAutoClicker\TemseiAutoClicker\obj\Release\TemseiAutoClicker.csprojAssemblyReference.cache
