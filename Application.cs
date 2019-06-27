@@ -318,7 +318,7 @@ namespace TemseiAutoClicker {
             string mouseButton = line.Substring(line.LastIndexOf("-") + 1);
             MouseButtons mouse = (mouseButton == "Left") ? MouseButtons.Left : MouseButtons.Right;
                 
-            return new ClickPosition(x, y, MouseButtons.Left);
+            return new ClickPosition(x, y, mouse);
         }
 
         public string GetStringBetweenCharacters(string @string , string firstCharacter, string lastCharacter) {       
