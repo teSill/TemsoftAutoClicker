@@ -79,10 +79,12 @@
     <Compile Include="CustomClickingThread.cs" />
     <Compile Include="LeftClickingThread.cs" />
     <Compile Include="Hotkeys.cs" />
+    <Compile Include="Load.cs" />
     <Compile Include="MouseEventData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RightClickingThread.cs" />
+    <Compile Include="Save.cs" />
     <EmbeddedResource Include="Application.resx">
       <DependentUpon>Application.cs</DependentUpon>
     </EmbeddedResource>

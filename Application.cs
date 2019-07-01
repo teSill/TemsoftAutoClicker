@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TemseiAutoClicker {
@@ -21,9 +22,9 @@ namespace TemseiAutoClicker {
 
         private GlobalHotkey ghk;
 
-        private Thread LeftClickThread;
-        private Thread RightClickThread;
-        private Thread CustomClickThread;
+        private Thread leftClickThread;
+        private Thread rightClickThread;
+        private Thread customClickThread;
 
         private bool randomizeClickSpeed = false;
         private int randomizationAmount;
@@ -39,10 +40,12 @@ namespace TemseiAutoClicker {
         private ClickType clickType = ClickType.Left;
 
         private bool saveSettings = false;
-        private string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
-        private string fileName = "settings.txt";
+        public static string FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
+        public static string FileName = "settings.txt";
         
         private bool holdCTRL = false; // Not used in the main version and will never be set to true
+
+        private bool singleLoop = false;
 
         private void Run() {
             if (!IsReady()) {
@@ -54,25 +57,29 @@ namespace TemseiAutoClicker {
                 this.WindowState = FormWindowState.Minimized;
                 LeftClickingThread leftClickingThread = new LeftClickingThread(leftClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
                 RightClickingThread rightClickingThread = new RightClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount);
-                CustomClickingThread customClickingThread = new CustomClickingThread(leftClickingSpeed, rightClickingSpeed, randomizeClickSpeed, randomizationAmount, clickPositions);
+                CustomClickingThread customClickingThread = new CustomClickingThread(leftClickingSpeed, rightClickingSpeed, randomizeClickSpeed, randomizationAmount, singleLoop, clickPositions, this);
                 switch(clickType) {
                     case ClickType.Custom:
-                        CustomClickThread = new Thread(new ThreadStart(customClickingThread.Run));
-                        CustomClickThread.Start();
+                        if (singleLoop) {
+                            Task.Delay(TimeSpan.FromSeconds(clickPositions.Count * leftClickingSpeed)).ContinueWith(t => Stop());
+                        }
+
+                        customClickThread = new Thread(new ThreadStart(customClickingThread.Run));
+                        customClickThread.Start();
                         break;
                     case ClickType.Multi:
-                        LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                        RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                        LeftClickThread.Start();
-                        RightClickThread.Start();
+                        leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        leftClickThread.Start();
+                        rightClickThread.Start();
                         break;
                     case ClickType.Left:
-                        LeftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                        LeftClickThread.Start();
+                        leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        leftClickThread.Start();
                         break;
                     case ClickType.Right:
-                        RightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                        RightClickThread.Start();
+                        rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        rightClickThread.Start();
                         break;
                 }
             } catch (Exception exc) {
@@ -88,11 +95,14 @@ namespace TemseiAutoClicker {
             }
         }
 
-        private void Stop() {
+        public void Stop() {
             try {
+                if (!isRunning)
+                    return;
+
                 this.WindowState = FormWindowState.Normal;
 
-                Thread[] threads = {LeftClickThread, RightClickThread, CustomClickThread};
+                Thread[] threads = {leftClickThread, rightClickThread, customClickThread};
                 foreach(Thread thread in threads) {
                     ShutdownThread(thread);
                 }
@@ -102,7 +112,7 @@ namespace TemseiAutoClicker {
                 if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
-                MessageBox.Show("Error stopping the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show("Error stopping the application - " + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -122,12 +132,13 @@ namespace TemseiAutoClicker {
             comboBox3.SelectedIndex = 2;
             ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
             ghk.Register();
-            LoadSettings();
+            new Load(this);
         }
 
         private void HandleHotkey() {
             if (isRunning) {
                 Stop();
+                Console.WriteLine("MOI");
             } else {
                 Run();
             }
@@ -225,7 +236,7 @@ namespace TemseiAutoClicker {
             RegisterNewClickPosition(new ClickPosition(e.X, e.Y, e.Button));
         }
 
-        private void RegisterNewClickPosition(ClickPosition mouseClick) {
+        public void RegisterNewClickPosition(ClickPosition mouseClick) {
             registeringClickPosition = false;
             clickPositions.Add(mouseClick);
             listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Click Type: " + mouseClick.GetMouseClickType()); 
@@ -276,59 +287,13 @@ namespace TemseiAutoClicker {
         }
 
         private void SaveSettings() {
-            if (!saveSettings)
-                return;
-
-            if (!Directory.Exists(filePath)) {
-                Directory.CreateDirectory(filePath);
-            }
-
-            try {
-                File.WriteAllText(Path.Combine(filePath, fileName), ConvertDataToString());
-            } catch (Exception e) {
-                System.Diagnostics.Debug.Write(e);
+            if (saveSettings) {
+                new Save(clickPositions);
             }
         }
 
-        private string ConvertDataToString() {
-            string contents = "";
-
-            foreach(ClickPosition click in clickPositions) {
-                contents += click.GetX() + "," + click.GetY() + "-" +  click.GetMouseClickType() + Environment.NewLine;
-            }
-
-            return contents;
-        }
-
-        private void LoadSettings() {
-            if (!Directory.Exists(filePath))
-                return;
-            string[] textContents = File.ReadAllLines(Path.Combine(filePath, fileName));
-
-            foreach(string line in textContents) {
-                RegisterNewClickPosition(ConvertStringToPosition(line));
-            }
-        }
-
-        private ClickPosition ConvertStringToPosition(string line) {
-            Console.WriteLine(line);
-
-            Int32.TryParse(line.Substring(0, line.IndexOf(",")), out int x);
-            Int32.TryParse(GetStringBetweenCharacters(line, ",", "-"), out int y);
-            string mouseButton = line.Substring(line.LastIndexOf("-") + 1);
-            MouseButtons mouse = (mouseButton == "Left") ? MouseButtons.Left : MouseButtons.Right;
-                
-            return new ClickPosition(x, y, mouse);
-        }
-
-        public string GetStringBetweenCharacters(string @string , string firstCharacter, string lastCharacter) {       
-            string finalString;     
-
-            int Pos1 = @string.IndexOf(firstCharacter) + firstCharacter.Length;
-            int Pos2 = @string.IndexOf(lastCharacter);
-            finalString = @string.Substring(Pos1, Pos2 - Pos1);
-
-            return finalString;
+        private void SingleLoopToggle(object sender, EventArgs e) {
+            singleLoop = !singleLoop;
         }
     }
 }

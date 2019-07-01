@@ -37,6 +37,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.advancedSettingsPanel = new System.Windows.Forms.Panel();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.button3 = new System.Windows.Forms.Button();
@@ -222,6 +223,7 @@
             // 
             // advancedSettingsPanel
             // 
+            this.advancedSettingsPanel.Controls.Add(this.checkBox4);
             this.advancedSettingsPanel.Controls.Add(this.checkBox3);
             this.advancedSettingsPanel.Controls.Add(this.listBox1);
             this.advancedSettingsPanel.Controls.Add(this.button3);
@@ -235,11 +237,23 @@
             this.advancedSettingsPanel.TabIndex = 2;
             this.advancedSettingsPanel.Visible = false;
             // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.checkBox4.Location = new System.Drawing.Point(25, 199);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(214, 24);
+            this.checkBox4.TabIndex = 7;
+            this.checkBox4.Text = "Stop after completing loop";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.SingleLoopToggle);
+            // 
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
             this.checkBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.checkBox3.Location = new System.Drawing.Point(25, 222);
+            this.checkBox3.Location = new System.Drawing.Point(25, 229);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(156, 24);
             this.checkBox3.TabIndex = 6;
@@ -250,7 +264,7 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(117, 120);
+            this.listBox1.Location = new System.Drawing.Point(117, 105);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(217, 82);
             this.listBox1.TabIndex = 5;
@@ -258,7 +272,7 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(340, 142);
+            this.button3.Location = new System.Drawing.Point(340, 127);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(84, 31);
             this.button3.TabIndex = 3;
@@ -285,7 +299,7 @@
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(369, 94);
+            this.textBox2.Size = new System.Drawing.Size(369, 90);
             this.textBox2.TabIndex = 2;
             this.textBox2.Text = resources.GetString("textBox2.Text");
             this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -293,7 +307,7 @@
             // button5
             // 
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(25, 145);
+            this.button5.Location = new System.Drawing.Point(25, 130);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(84, 28);
             this.button5.TabIndex = 0;
@@ -339,7 +353,7 @@
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.button2);
-            this.panel1.Location = new System.Drawing.Point(137, 188);
+            this.panel1.Location = new System.Drawing.Point(72, 188);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(287, 58);
             this.panel1.TabIndex = 15;
@@ -354,6 +368,7 @@
             this.checkBox2.TabIndex = 16;
             this.checkBox2.Text = "Hold CTRL";
             this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.Visible = false;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.HoldCTRL_CheckedChanged);
             // 
             // Application
@@ -418,6 +433,7 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.CheckBox checkBox4;
     }
 }
 

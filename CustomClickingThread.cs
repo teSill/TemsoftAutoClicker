@@ -15,14 +15,19 @@ namespace TemseiAutoClicker {
         private float rightClickSpeed;
         private bool randomize;
         private float randomizationAmount;
+        private bool singleLoop;
         private List<ClickPosition> clickPositions;
+        private Application application;
 
-        public CustomClickingThread(float leftClickSpeed, float rightClickSpeed, bool randomize, float randomizationAmount, List<ClickPosition> clickPositions) {
+        public CustomClickingThread(float leftClickSpeed, float rightClickSpeed, bool randomize, float randomizationAmount, bool singleLoop, 
+            List<ClickPosition> clickPositions, Application application) {
             this.leftClickSpeed = leftClickSpeed;
             this.rightClickSpeed = rightClickSpeed;
             this.randomize = randomize;
             this.randomizationAmount = randomizationAmount;
+            this.singleLoop = singleLoop;
             this.clickPositions = clickPositions;
+            this.application = application;
         }
 
         public void Run() {
@@ -37,6 +42,8 @@ namespace TemseiAutoClicker {
                         }
                     }
                 }
+               // if (singleLoop)
+                    //application.Stop();
             } catch (Exception exc){
                 //MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

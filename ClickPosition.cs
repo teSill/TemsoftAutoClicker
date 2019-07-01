@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TemseiAutoClicker {
-    class ClickPosition {
+    public class ClickPosition {
 
         private int x;
         private int y;
