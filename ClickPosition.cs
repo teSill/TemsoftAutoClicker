@@ -8,27 +8,14 @@ using System.Windows.Forms;
 namespace TemseiAutoClicker {
     public class ClickPosition {
 
-        private int x;
-        private int y;
-        private MouseButtons mouseButton;
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public MouseButtons MouseButton;
 
         public ClickPosition(int x, int y, MouseButtons mouseButton) {
-            this.x = x;
-            this.y = y;
-            this.mouseButton = mouseButton;
+            X = x;
+            Y = y;
+            MouseButton = mouseButton;
         }
-
-        public int GetX() {
-            return x;
-        }
-
-        public int GetY() {
-            return y;
-        }
-
-        public MouseButtons GetMouseClickType() {
-            return mouseButton;
-        }
-
     }
 }

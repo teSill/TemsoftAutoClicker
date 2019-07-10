@@ -38,15 +38,17 @@ namespace TemseiAutoClicker {
             mouse_event(MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
         }
 
-        public void ClickCustomPositionEvent(int x, int y, MouseButtons mouseButton) {
-            Cursor.Position = new Point(x, y);
-            if (mouseButton == MouseButtons.Left) {
-                mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-            } else {
-                mouse_event(MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0);
-                mouse_event(MOUSEEVENTF_RIGHTUP, x, y, 0, 0);
-            }
+        public void HoldDownMouse(string button) {
+            mouse_event((button == "left") ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_RIGHTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+        }
+
+        public void ReleaseMouse(string button) {
+            mouse_event((button == "left") ? MOUSEEVENTF_LEFTUP : MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+        }
+
+        public void ClickCurrentPositionEvent(MouseButtons mouseButton) {
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
 
         public double GetRandomizedClickSpeed(bool randomize, float defaultSpeed, float randomizationAmount) {

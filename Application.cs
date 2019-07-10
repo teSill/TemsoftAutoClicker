@@ -1,7 +1,6 @@
 ﻿using Gma.System.MouseKeyHook;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -14,100 +13,150 @@ namespace TemseiAutoClicker {
     enum ClickType {
         Left,
         Right,
-        Multi,
-        Custom
+        Multi
     }
 
     public partial class Application : Form {
 
-        private GlobalHotkey ghk;
+        private MouseEventData _mouseEventData = new MouseEventData();
 
-        private Thread leftClickThread;
-        private Thread rightClickThread;
-        private Thread customClickThread;
+        public static List<char> activeHotkeys = new List<char>();
+        private char _defaultHotkey = 'H';
 
-        private bool randomizeClickSpeed = false;
-        private int randomizationAmount;
-        private float leftClickingSpeed = 0;
-        private float rightClickingSpeed = 0;
+        private Thread _leftClickThread;
+        private Thread _rightClickThread;
+        private Thread _customClickThread;
 
-        private bool registeringClickPosition = false;
+        private bool _randomizeClickSpeed = false;
+        private int _randomizationAmount;
+        private float _leftClickingSpeed = 0;
+        private float _rightClickingSpeed = 0;
+        private bool _holdLeftMouseButton;
+        private bool _holdRightMouseButton;
+
+        private bool _registeringClickPosition = false;
         private List<ClickPosition> clickPositions = new List<ClickPosition>();
 
-        private bool isRunning = false;
+        public List<ClickCollection> clickCollections = new List<ClickCollection>();
+        public static string availableLetters =  "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        private IKeyboardMouseEvents m_GlobalHook;
-        private ClickType clickType = ClickType.Left;
+        private bool _isRunning = false;
 
-        private bool saveSettings = false;
-        public static string FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
-        public static string FileName = "settings.txt";
+        private IKeyboardMouseEvents _GlobalHook;
+        private ClickType _clickType = ClickType.Left;
+
+        private bool _saveSettings = false;
+        public static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
+
+        public bool listEditFormIsOpen = false;
         
         private bool holdCTRL = false; // Not used in the main version and will never be set to true
 
-        private bool singleLoop = false;
+        private Keys _activeKey;
+
+        public int ListsAtStart { get; set; }
 
         private void Run() {
             if (!IsReady()) {
+                Console.WriteLine("Not ready!");
                 return;
             }
 
             try {
-                isRunning = true;
-                this.WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickingThread = new LeftClickingThread(leftClickingSpeed, randomizeClickSpeed, randomizationAmount, holdCTRL);
-                RightClickingThread rightClickingThread = new RightClickingThread(rightClickingSpeed, randomizeClickSpeed, randomizationAmount);
-                CustomClickingThread customClickingThread = new CustomClickingThread(leftClickingSpeed, rightClickingSpeed, randomizeClickSpeed, randomizationAmount, singleLoop, clickPositions, this);
-                switch(clickType) {
-                    case ClickType.Custom:
-                        if (singleLoop) {
-                            Task.Delay(TimeSpan.FromSeconds(clickPositions.Count * leftClickingSpeed)).ContinueWith(t => Stop());
-                        }
-
-                        customClickThread = new Thread(new ThreadStart(customClickingThread.Run));
-                        customClickThread.Start();
-                        break;
+                _isRunning = true;
+                WindowState = FormWindowState.Minimized;
+                LeftClickingThread leftClickingThread = new LeftClickingThread(_leftClickingSpeed, _randomizeClickSpeed, _randomizationAmount, holdCTRL, _holdLeftMouseButton);
+                RightClickingThread rightClickingThread = new RightClickingThread(_rightClickingSpeed, _randomizeClickSpeed, _randomizationAmount, _holdRightMouseButton);
+                switch(_clickType) {
                     case ClickType.Multi:
-                        leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                        rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                        leftClickThread.Start();
-                        rightClickThread.Start();
+                        _leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        _rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        _leftClickThread.Start();
+                        _rightClickThread.Start();
                         break;
                     case ClickType.Left:
-                        leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
-                        leftClickThread.Start();
+                        _leftClickThread = new Thread(new ThreadStart(leftClickingThread.Run));
+                        _leftClickThread.Start();
                         break;
                     case ClickType.Right:
-                        rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
-                        rightClickThread.Start();
+                        _rightClickThread = new Thread(new ThreadStart(rightClickingThread.Run));
+                        _rightClickThread.Start();
                         break;
                 }
             } catch (Exception exc) {
-                MessageBox.Show("Error in the main method!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+            }
+        }
+
+        private void RunCustomThread(char key) {
+            try {
+                if (_activeKey == (Keys) key) { // shutdown thread and return if user presses the current hotkey
+                    Stop();
+                    return;
+                }
+                if (_activeKey != Keys.None) { // shutdown the current thread if it exists
+                    Stop();
+                }
+
+                ClickCollection clickCollection = FindCollectionByKey((Keys) key);
+                if (clickCollection == null) {
+                    MessageBox.Show("Couldn't find the right list to activate...", "Error");
+                    return;
+                }
+                if (clickCollection.Clicks.Count == 0) {
+                    MessageBox.Show("Your list doesn't contain any clicks.", "Error");
+                    return;
+                }
+
+                WindowState = FormWindowState.Minimized;
+
+                _activeKey = (Keys) key;
+
+                CustomClickingThread customClickingThread = new CustomClickingThread
+                    (clickCollection.ClickInterval, clickCollection.SingleLoop, clickCollection.Clicks, this);
+
+                /*if (singleLoop) {
+                    Task.Delay(TimeSpan.FromSeconds(clickPositions.Count * leftClickingSpeed)).ContinueWith(t => Stop());
+                }*/
+
+                _customClickThread = new Thread(new ThreadStart(customClickingThread.Run));
+                _customClickThread.Start();
+
+
+            } catch (Exception exc) {
+                MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
             }
         }
 
         private void ShutdownThread(Thread thread) {
             if (thread != null && thread.IsAlive) {
-                thread.Abort();
+                thread.Interrupt();
                 thread.Join();
-                thread = null;
             }
         }
 
         public void Stop() {
             try {
-                if (!isRunning)
-                    return;
+                /*if (!_isRunning)
+                    return;*/
 
-                this.WindowState = FormWindowState.Normal;
+                WindowState = FormWindowState.Normal;
 
-                Thread[] threads = {leftClickThread, rightClickThread, customClickThread};
+                Thread[] threads = { _leftClickThread, _rightClickThread, _customClickThread };
                 foreach(Thread thread in threads) {
                     ShutdownThread(thread);
                 }
 
-                isRunning = false;
+                if (_holdLeftMouseButton || _holdRightMouseButton) {
+                    if (_holdLeftMouseButton) {
+                       _mouseEventData.ReleaseMouse("left");
+                    } else {
+                        _mouseEventData.ReleaseMouse("right");
+                    }
+                }
+
+                _isRunning = false;
+                _activeKey = Keys.None;
 
                 if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
@@ -125,71 +174,74 @@ namespace TemseiAutoClicker {
                 MessageBox.Show("Application is already running.");
                 System.Windows.Forms.Application.ExitThread();
             }
-            m_GlobalHook = Hook.GlobalEvents();
-            m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
+
+            _GlobalHook = Hook.GlobalEvents();
+            _GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
+            _GlobalHook.KeyDown += GlobalHookKeyPress;
             comboBox1.SelectedIndex = 1;
             comboBox2.SelectedIndex = 2;
             comboBox3.SelectedIndex = 2;
-            ghk = new GlobalHotkey(Constants.CTRL , Keys.H, this);
-            ghk.Register();
-            new Load(this);
+            new Load(this, clickCollections);
+            activeHotkeys.Add(_defaultHotkey);
         }
 
-        private void HandleHotkey() {
-            if (isRunning) {
+        private void PrepareRun(char key) {
+            if (_isRunning) {
                 Stop();
-                Console.WriteLine("MOI");
-            } else {
+                return;
+            }
+
+            supportBox.Focus();
+
+            if (_defaultHotkey == key && !advancedSettingsPanel.Visible) {
                 Run();
+            } else if (activeHotkeys.Contains(key) && advancedSettingsPanel.Visible && key != _defaultHotkey) {
+                RunCustomThread(key);
             }
         }
 
-        protected override void WndProc(ref Message m) {
-            if (m.Msg == Constants.WM_HOTKEY_MSG_ID)
-                HandleHotkey();
-            base.WndProc(ref m);
+        private void GlobalHookKeyPress(object sender, KeyEventArgs e) {
+            if (ModifierKeys == Keys.Control && activeHotkeys.Contains((char) e.KeyCode)) {
+                PrepareRun((char) e.KeyCode);
+            }
         }
 
         private void LeftClickButton_CheckedChanged(object sender, EventArgs e) {
-            clickType = ClickType.Left;
+            _clickType = ClickType.Left;
         }
 
         private void RightClickButton_CheckedChanged(object sender, EventArgs e) {
-            clickType = ClickType.Right;
+            _clickType = ClickType.Right;
         }
 
         private void BothButton_CheckedChanged(object sender, EventArgs e) {
-            clickType = ClickType.Multi;
-        }
-
-        private void CustomButton_CheckedChanged(object sender, EventArgs e) {
-            if (clickType != ClickType.Custom)
-                advancedSettingsPanel.Visible = true;
-            clickType = ClickType.Custom;
+            _clickType = ClickType.Multi;
         }
 
         private void LeftClickIntervalBox_SelectedIndexChanged(object sender, EventArgs e) {
-            float.TryParse(comboBox1.Text, out leftClickingSpeed);
+            float.TryParse(comboBox1.Text, out _leftClickingSpeed);
         }
 
         private void RightClickIntervalBox_SelectedIndexChanged(object sender, EventArgs e) {
-            float.TryParse(comboBox2.Text, out rightClickingSpeed);
+            float.TryParse(comboBox2.Text, out _rightClickingSpeed);
         }
 
         private void HotKeyTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyValue >= 0x41 && e.KeyValue <= 0x5A) { // Letters only
-                ghk.Unregister();
-                textBox1.Text = "CTRL + " + e.KeyCode.ToString();
-                ghk = new GlobalHotkey(Constants.CTRL , e.KeyCode, this);
-                if (!ghk.Register()) {
-                    MessageBox.Show("Couldn't register new hotkey!", "Error");
+                if (activeHotkeys.Contains((char) e.KeyCode)) {
+                    MessageBox.Show("The hotkey '" + e.KeyCode + "' is already in use.");
+                    return;
                 }
+                textBox1.Text = "CTRL + " + e.KeyCode.ToString();
+                activeHotkeys.Remove(_defaultHotkey);
+                _defaultHotkey = (char) e.KeyCode;
+                activeHotkeys.Add(_defaultHotkey);
             }
         }
 
         private void RandomizeButton_CheckedChanged(object sender, EventArgs e) {
             comboBox3.Enabled = !comboBox3.Enabled;
-            randomizeClickSpeed = !randomizeClickSpeed;
+            _randomizeClickSpeed = !_randomizeClickSpeed;
         }
 
         private static bool IsAlreadyRunning() {
@@ -205,7 +257,7 @@ namespace TemseiAutoClicker {
         }
 
         private void RegisterButton_Click(object sender, EventArgs e) {
-            registeringClickPosition = true;
+            _registeringClickPosition = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
@@ -213,37 +265,37 @@ namespace TemseiAutoClicker {
             advancedSettingsPanel.Visible = true;
         }
 
-        private void ContinueButton_Click(object sender, EventArgs e) {
+        private void continueButton_Click(object sender, EventArgs e) {
             advancedSettingsPanel.Visible = false;
-            if (clickPositions.Count > 0) {
-                radioButton4.Checked = true;
-            }
-        }
-
-        private void ClearButton_Click(object sender, EventArgs e) {
-            if (clickPositions.Count <= 0) {
-                MessageBox.Show("There are no values in the list to clear!", "Error");
-            } else {
-                clickPositions.Clear();
-                listBox1.Items.Clear();
-            }
         }
 
         private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e) {
-            if (!registeringClickPosition)
+            if (!_registeringClickPosition)
                 return;
             e.Handled = true;
             RegisterNewClickPosition(new ClickPosition(e.X, e.Y, e.Button));
         }
 
-        public void RegisterNewClickPosition(ClickPosition mouseClick) {
-            registeringClickPosition = false;
-            clickPositions.Add(mouseClick);
-            listBox1.Items.Add((clickPositions.IndexOf(mouseClick) + 1) + ". X: " + mouseClick.GetX() + " Y: " + mouseClick.GetY() + " Click Type: " + mouseClick.GetMouseClickType()); 
+        private void RegisterNewClickPosition(ClickPosition mouseClick) {
+            if (listBox.SelectedItem == null)
+                return;
+
+            ClickCollection collection = GetSelectedClickCollection();
+            _registeringClickPosition = false;
+            collection.Clicks.Add(mouseClick);
+            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + " Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
             this.WindowState = FormWindowState.Normal;
         }
 
-        private void Application_FormClosing_1(object sender, FormClosingEventArgs e) {
+        private void Application_FormClosing(object sender, FormClosingEventArgs e) {
+            if (!_saveSettings && ListsAtStart != clickCollections.Count) {
+                DialogResult result = MessageBox.Show("If you exit now, you'll lose your unsaved custom lists. Are you sure you want exit without saving?", "Warning", MessageBoxButtons.YesNo);
+                if (result == DialogResult.No) {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+            
             SaveSettings();
             Stop();
             System.Windows.Forms.Application.ExitThread();
@@ -259,21 +311,17 @@ namespace TemseiAutoClicker {
         }
 
         private bool IsReady() {
-            if ((clickType == ClickType.Left && !TryParse(comboBox1, out leftClickingSpeed) || 
-                clickType == ClickType.Right && !TryParse(comboBox2, out rightClickingSpeed) ||
-                clickType == ClickType.Multi && !TryParse(comboBox1, out leftClickingSpeed) && !TryParse(comboBox2, out rightClickingSpeed))) {
+            if ((_clickType == ClickType.Left && !TryParse(comboBox1, out _leftClickingSpeed) || 
+                _clickType == ClickType.Right && !TryParse(comboBox2, out _rightClickingSpeed) ||
+                _clickType == ClickType.Multi && !TryParse(comboBox1, out _leftClickingSpeed) && !TryParse(comboBox2, out _rightClickingSpeed))) {
                 MessageBox.Show("Please remove any invalid characters from the click interval text box!", "Error");
                 return false;
             }
-            if (randomizeClickSpeed) {
-                if (!int.TryParse(comboBox3.Text.Remove(comboBox3.Text.Length - 1), out randomizationAmount)) {
+            if (_randomizeClickSpeed) {
+                if (!int.TryParse(comboBox3.Text.Remove(comboBox3.Text.Length - 1), out _randomizationAmount)) {
                     MessageBox.Show("There was a problem setting your randomization percentage. Please try again!", "Error");
                     return false;
                 }
-            }
-            if (clickType == ClickType.Custom && clickPositions.Count == 0) {
-                MessageBox.Show("Your custom click list is empty! Add some positions for the program to iterate over or choose another clicking mode.", "Error");
-                return false;
             }
             return true;
         }
@@ -283,17 +331,151 @@ namespace TemseiAutoClicker {
         }
 
         private void SaveSettingsToggle(object sender, EventArgs e) {
-            saveSettings = !saveSettings;
+            _saveSettings = !_saveSettings;
         }
 
         private void SaveSettings() {
-            if (saveSettings) {
-                new Save(clickPositions);
+            if (_saveSettings) {
+                new Save(clickCollections);
             }
         }
 
-        private void SingleLoopToggle(object sender, EventArgs e) {
-            singleLoop = !singleLoop;
+        private void AddListButton(object sender, EventArgs e) {
+            if (availableLetters.Length == 0) {
+                MessageBox.Show("You have too many lists! Please remove a list before adding a new one.", "Error");
+                return;
+            }
+            char randomChar = Utility.GetRandomLetter();
+            activeHotkeys.Add(randomChar);
+            Console.WriteLine(randomChar + " was added.");
+
+
+            availableLetters = availableLetters.Replace(randomChar.ToString(), string.Empty);
+
+            ClickCollection clickCollection = new ClickCollection(new List<ClickPosition>(), Utility.GetRandomString(4), false, randomChar, 1);
+            clickCollections.Add(clickCollection);
+            listBox.Items.Add(clickCollection.Name + " - CTRL + " + clickCollection.Hotkey.ToString());
+            listBox.SetSelected(listBox.Items.Count - 1, true);
+        }
+
+        private void EditListButton(object sender, EventArgs e) {
+            if (listEditFormIsOpen)
+                return;
+
+            if (listBox.SelectedItem == null) {
+                MessageBox.Show("Please select the list you want to edit!");
+                return;
+            }
+
+            ClickCollection collection = GetSelectedClickCollection();
+
+            if (collection == null) {
+                MessageBox.Show("Unexpected problem: couldn't find the selected list. \n Please contact the developer if the problem persists.");
+                return;
+            }
+
+            ListEditForm listEditForm = new ListEditForm(this, collection.Name, collection.SingleLoop, collection.Hotkey, collection.ClickInterval);
+            listEditForm.Show();
+            listEditFormIsOpen = true;
+        }
+
+        public ClickCollection FindCollectionByName(string str) {
+            foreach(ClickCollection collection in clickCollections) {
+                if (collection.Name == str)
+                    return collection;
+            }
+            return null;
+        }
+
+        private ClickCollection FindCollectionByKey(Keys key) {
+            char hotkey = (char) key;
+            foreach(ClickCollection collection in clickCollections) {
+                if (collection.Hotkey == hotkey)
+                    return collection;
+            }
+            return null;
+        }
+
+        public void UpdateTextBox(string oldName, string newName, char hotkey) {
+            int index = listBox.FindString(oldName);
+            listBox.Items[index] = newName + " - CTRL + " + hotkey;
+        }
+
+        public void UpdateLoadedListData(List<ClickCollection> clickCollections) {
+            for(int i = 0; i < clickCollections.Count; i++) {
+                listBox.Items.Add(clickCollections[i]);
+                listBox.Items[i] = clickCollections[i].Name + " - CTRL + " + clickCollections[i].Hotkey;
+            }
+
+            foreach(ClickCollection collection in clickCollections) {
+                activeHotkeys.Add(collection.Hotkey);
+                availableLetters = availableLetters.Replace(collection.Hotkey.ToString().ToUpper(), string.Empty);
+                Console.WriteLine("Registered: " + collection.Hotkey);
+            }
+            
+        }
+
+        public void DeleteTextBox(string name) {
+            int index = listBox.FindString(name);
+            listBox.Items.RemoveAt(index);
+        }
+
+        private void listBox_SelectedIndexChanged(object sender, EventArgs e) {
+            if (GetSelectedClickCollection() == null)
+                return;
+
+            List<ClickPosition> clicks = GetSelectedClickCollection().Clicks;
+            clickListBox.Items.Clear();
+
+            for(int i = 0; i < clicks.Count; i++) {
+                clickListBox.Items.Add((i + 1) + ". X: " + clicks[i].X + " Y: " + clicks[i].Y + " Type: " + clicks[i].MouseButton); 
+            }
+        }
+
+        private ClickCollection GetSelectedClickCollection() {
+            if (listBox.Items.Count == 0 || listBox.SelectedItem == null)
+                return null;
+
+            int index = listBox.Text.IndexOf("-") - 1;
+            string collectionName = listBox.Text.Substring(0, index);
+            return FindCollectionByName(collectionName);
+        }
+
+        private void clickListBox_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Delete) {
+                ClickCollection collection = GetSelectedClickCollection();
+                string str = clickListBox.SelectedItem.ToString();
+                string index = str[0].ToString();
+
+                clickListBox.Items.Remove(clickListBox.SelectedItem);
+                collection.Clicks.RemoveAt(Convert.ToInt32(index) - 1);
+
+                e.Handled = true;
+            }
+        }
+
+        private void twitterLogo_Click(object sender, EventArgs e) {
+            System.Diagnostics.Process.Start("https://twitter.com/Temsoftio");
+        }
+
+        private void facebookLogo_Click(object sender, EventArgs e) {
+            System.Diagnostics.Process.Start("https://www.facebook.com/Temsoft-425887708003948/");
+        }
+
+        private void githubLogo_Click(object sender, EventArgs e) {
+            System.Diagnostics.Process.Start("https://github.com/teSill/TemseiAutoClicker");
+        }
+
+        private void holdLeftCheckBox_CheckedChanged(object sender, EventArgs e) {
+            _holdLeftMouseButton = !_holdLeftMouseButton;
+            clickIntervalsGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
+            clickRandomizationGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
+        }
+
+        private void holdRightCheckBox_CheckedChanged(object sender, EventArgs e) {
+            _holdRightMouseButton = !_holdRightMouseButton;
+            clickIntervalsGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
+            clickRandomizationGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
         }
     }
 }

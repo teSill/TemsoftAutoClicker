@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,35 +12,27 @@ namespace TemseiAutoClicker {
 
         MouseEventData mouseEvents = new MouseEventData();
         
-        private float leftClickSpeed;
-        private float rightClickSpeed;
-        private bool randomize;
-        private float randomizationAmount;
-        private bool singleLoop;
-        private List<ClickPosition> clickPositions;
-        private Application application;
+        private float _clickInterval;
+        private bool _singleLoop;
+        private List<ClickPosition> _clickPositions;
+        private Application _application;
 
-        public CustomClickingThread(float leftClickSpeed, float rightClickSpeed, bool randomize, float randomizationAmount, bool singleLoop, 
+        public CustomClickingThread(float clickInterval, bool singleLoop, 
             List<ClickPosition> clickPositions, Application application) {
-            this.leftClickSpeed = leftClickSpeed;
-            this.rightClickSpeed = rightClickSpeed;
-            this.randomize = randomize;
-            this.randomizationAmount = randomizationAmount;
-            this.singleLoop = singleLoop;
-            this.clickPositions = clickPositions;
-            this.application = application;
+            _clickInterval = clickInterval;
+            _singleLoop = singleLoop;
+            _clickPositions = clickPositions;
+            _application = application;
         }
 
         public void Run() {
             try {
                 while(true) {
-                    foreach(ClickPosition click in clickPositions) {
-                        mouseEvents.ClickCustomPositionEvent(click.GetX(), click.GetY(), click.GetMouseClickType());
-                        if (click.GetMouseClickType() == MouseButtons.Left) {
-                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(randomize, leftClickSpeed, randomizationAmount) * 1000));
-                        } else {
-                            Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(randomize, rightClickSpeed, randomizationAmount) * 1000));
-                        }
+                    foreach(ClickPosition click in _clickPositions) {
+                        //mouseEvents.ClickCustomPositionEvent(click.X, click.Y, click.MouseButton);
+                        LinearSmoothMove(new Point(click.X, click.Y), 5, 10, click.MouseButton);
+                        
+                        Thread.Sleep((int) (_clickInterval * 1000));
                     }
                 }
                // if (singleLoop)
@@ -47,6 +40,29 @@ namespace TemseiAutoClicker {
             } catch (Exception exc){
                 //MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public void LinearSmoothMove(Point newPosition, int steps, int sleepTime, MouseButtons mouseButton) {
+            Point start = new Point(Cursor.Position.X, Cursor.Position.Y);
+            PointF iterPoint = start;
+
+            // Find the slope of the line segment defined by start and newPosition
+            PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
+
+            // Divide by the number of steps
+            slope.X = slope.X / steps;
+            slope.Y = slope.Y / steps;
+
+            // Move the mouse to each iterative point.
+            for (int i = 0; i < steps; i++) {
+                iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
+                Cursor.Position = Point.Round(iterPoint);
+                Thread.Sleep(sleepTime);
+            }
+
+            // Move the mouse to the final destination.
+            Cursor.Position = newPosition;
+            mouseEvents.ClickCurrentPositionEvent(mouseButton);
         }
     }
 }

@@ -4,23 +4,29 @@ using System.Threading;
 namespace TemseiAutoClicker {
     class RightClickingThread {
 
-        MouseEventData mouseEvents = new MouseEventData();
+        private MouseEventData _mouseEvents = new MouseEventData();
         
-        private float RightClickSpeed;
-        private bool Randomize;
-        private float RandomizationAmount;
+        private float _rightClickSpeed;
+        private bool _randomize;
+        private float _randomizationAmount;
+        private bool _holdMouse;
 
-        public RightClickingThread(float rightClickSpeed, bool randomize, float randomizationAmount) {
-            this.RightClickSpeed = rightClickSpeed;
-            this.Randomize = randomize;
-            this.RandomizationAmount = randomizationAmount;
+        public RightClickingThread(float rightClickSpeed, bool randomize, float randomizationAmount, bool holdMouse) {
+            _rightClickSpeed = rightClickSpeed;
+            _randomize = randomize;
+            _randomizationAmount = randomizationAmount;
+            _holdMouse = holdMouse;
         }
 
         public void Run() {
+            if (_holdMouse) {
+                _mouseEvents.HoldDownMouse("right");
+                return;
+            }
             try {
                 while(true) {
-                    mouseEvents.ClickRightMouseButtonEvent();
-                    Thread.Sleep((int) (mouseEvents.GetRandomizedClickSpeed(Randomize, RightClickSpeed, RandomizationAmount) * 1000));
+                    _mouseEvents.ClickRightMouseButtonEvent();
+                    Thread.Sleep((int) (_mouseEvents.GetRandomizedClickSpeed(_randomize, _rightClickSpeed, _randomizationAmount) * 1000));
                 }
             } catch (Exception exc){
                 //MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
