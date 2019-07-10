@@ -1,4 +1,4 @@
-# TemseiAutoClicker
+# Temsei Auto Clicker
 
 Direct download to the executable can be found here: https://github.com/teSill/AutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
