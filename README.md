@@ -19,6 +19,7 @@ Main Features
   - Advanced Settings
     - Create customizable clicking lists
     - Add click positions to your lists either one at a time, or record lengthy clicking sequences
+    - Achieve infinitely complex clicking operations by combining your lists with the "Automate" button, where they will run in order until manually stopped
     - Modify the names of your lists to keep things clean and organized
     - Set clicking intervals of individual lists
     - Ability to make your lists only run once before the thread automatically terminates
