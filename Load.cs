@@ -81,10 +81,14 @@ namespace TemseiAutoClicker {
         }
 
         private void LoadAutomatedLists() {
+            string path = Path.Combine(Application.FolderPath, "AutomatedLists.txt");
+            if (!File.Exists(path))
+                return;
+
             List<string> listNames = new List<string>();
-            using(StreamReader sr = File.OpenText(Path.Combine(Application.FolderPath, "AutomatedLists.txt"))) {
+            using (StreamReader sr = File.OpenText(path)) {
                 string str = "";
-                while((str = sr.ReadLine()) != null) {
+                while ((str = sr.ReadLine()) != null) {
                     listNames.Add(str);
                 }
             }

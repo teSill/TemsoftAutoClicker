@@ -57,16 +57,15 @@ namespace TemseiAutoClicker {
         private ClickType _clickType = ClickType.Left;
         private Mode _mode = Mode.Normal;
 
+        public int ListsAtStart { get; set; }
         private bool _saveSettings = false;
         public static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
 
         public bool listEditFormIsOpen = false;
         
-        private bool holdCTRL = false; // Not used in the main version and will never be set to true
+        private bool _holdCTRL = false; // Not used in the main version and will never be set to true
 
         private Keys _activeKey; // The key that was last pressed. Used to determine course of action in custom thread running
-
-        public int ListsAtStart { get; set; }
 
         private void Run() {
             if (!IsReady()) {
@@ -81,7 +80,7 @@ namespace TemseiAutoClicker {
             try {
                 _isRunning = true;
                 WindowState = FormWindowState.Minimized;
-                LeftClickingThread leftClickingThread = new LeftClickingThread(_leftClickingSpeed, _randomizeClickSpeed, _randomizationAmount, holdCTRL, _holdLeftMouseButton);
+                LeftClickingThread leftClickingThread = new LeftClickingThread(_leftClickingSpeed, _randomizeClickSpeed, _randomizationAmount, _holdCTRL, _holdLeftMouseButton);
                 RightClickingThread rightClickingThread = new RightClickingThread(_rightClickingSpeed, _randomizeClickSpeed, _randomizationAmount, _holdRightMouseButton);
                 switch(_clickType) {
                     case ClickType.Multi:
@@ -185,7 +184,7 @@ namespace TemseiAutoClicker {
                 _isRunning = false;
                 _activeKey = Keys.None;
 
-                if(holdCTRL)
+                if(_holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
                 Console.WriteLine("Error terminating threads: " + ex);
@@ -315,8 +314,9 @@ namespace TemseiAutoClicker {
             if (!_registeringClickPosition && !_recordingSequence)
                 return;
 
-            e.Handled = true;
+            
             if (_registeringClickPosition) {
+                e.Handled = true;
                 RegisterNewClickPosition(new ClickPosition(e.X, e.Y, e.Button));
             } else {
                 RegisterClickFromSequence(new ClickPosition(e.X, e.Y, e.Button));
@@ -344,7 +344,7 @@ namespace TemseiAutoClicker {
 
             ClickCollection collection = GetSelectedClickCollection();
             collection.Clicks.Add(mouseClick);
-            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + "Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
+            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + " Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
         }
 
         private void StopRecordingMouseClicks() {
@@ -364,7 +364,7 @@ namespace TemseiAutoClicker {
             ClickCollection collection = GetSelectedClickCollection();
             _registeringClickPosition = false;
             collection.Clicks.Add(mouseClick);
-            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + "Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
+            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + " Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
             this.WindowState = FormWindowState.Normal;
         }
 
@@ -408,7 +408,7 @@ namespace TemseiAutoClicker {
         }
 
         private void HoldCTRL_CheckedChanged(object sender, EventArgs e) {
-            holdCTRL = !holdCTRL;
+            _holdCTRL = !_holdCTRL;
         }
 
         private void SaveSettingsToggle(object sender, EventArgs e) {
@@ -518,7 +518,7 @@ namespace TemseiAutoClicker {
             clickListBox.Items.Clear();
 
             for(int i = 0; i < clicks.Count; i++) {
-                clickListBox.Items.Add((i + 1) + ". X: " + clicks[i].X + "Y: " + clicks[i].Y + " Type: " + clicks[i].MouseButton); 
+                clickListBox.Items.Add((i + 1) + ". X: " + clicks[i].X + " Y: " + clicks[i].Y + " Type: " + clicks[i].MouseButton); 
             }
         }
 

@@ -431,13 +431,15 @@
             // 
             // button1
             // 
+            this.button1.BackColor = System.Drawing.SystemColors.Highlight;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F);
             this.button1.Location = new System.Drawing.Point(14, 19);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(80, 30);
             this.button1.TabIndex = 9;
             this.button1.Text = "Add List";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.AddListButton);
             // 
             // button6
@@ -459,7 +461,7 @@
             this.groupBox7.Size = new System.Drawing.Size(138, 112);
             this.groupBox7.TabIndex = 12;
             this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "Lists";
+            this.groupBox7.Text = "Lists (Name - Hotkey)";
             // 
             // listBox
             // 

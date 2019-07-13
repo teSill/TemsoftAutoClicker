@@ -32,9 +32,7 @@ namespace TemseiAutoClicker {
                         count++;
                         MouseEventData.LinearSmoothMove(new Point(click.X, click.Y), 5, 10, click.MouseButton);
 
-                        if (count < _clickPositions.Count) {
-                            Thread.Sleep((int) (_clickInterval * 1000));
-                        }
+                        Thread.Sleep((int) (_clickInterval * 1000));
                     }
 
                     var success = SingleLoopEvent;
