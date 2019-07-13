@@ -2,18 +2,29 @@
 
 Direct download to the executable can be found here: https://github.com/teSill/AutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
-![TemseiAutoClicker](https://user-images.githubusercontent.com/24759016/55986921-1864d300-5ca9-11e9-968e-6d3d59c243b8.png)
+![TemseiAutoClicker](http://temsoft.io/temsoft_assets/AutoClicker1.png)
 
-![TemseiAutoClickerInterface2](https://user-images.githubusercontent.com/24759016/55911093-99a86100-5be8-11e9-930a-dd7bece04c71.png)
+![TemseiAutoClickerInterface2](http://temsoft.io/temsoft_assets/AutoClicker2.png)
 
-This is a very light auto clicker with traditional auto clicker functionalities and a little more!
+![TemseiAutoClickerInterface2](http://temsoft.io/temsoft_assets/AutoClicker3.png)
 
-- Clicking types supported:
-  - Left clicking
-  - Right clicking
-  - Simultaneous clicking of both left and right mouse clicks
-- Click intervals can be randomized between with a value between 5-100% (eg. a 1 second click interval with a 100% randomization would return a value between 0.5s and 2s)
-- On top of auto clicking where your mouse currently is, you can also set up to custom click positions which the program will iterate over in order
+Temsei Auto Clicker is a reliable lightweight auto clicker that can be used to complete both traditionally simple left and right click operations, but also set-up to perform infinitely complex click sequences. 
 
+Main Features
+  - Regular Settings
+    - Left clicking, right clicking and simultaneous clicking of them both
+    - Set up your own click intervals (very fast clicking speeds can be achieved)
+    - Randomize your click intervals
+    - Holding down of left and right mouse buttons
+  - Advanced Settings
+    - Create customizable clicking lists
+    - Add click positions to your lists either one at a time, or record lengthy clicking sequences
+    - Achieve infinitely complex clicking operations by combining your lists with the "Automate" button, where they will run in order until manually stopped
+    - Modify the names of your lists to keep things clean and organized
+    - Set clicking intervals of individual lists
+    - Ability to make your lists only run once before the thread automatically terminates
+    - Save and load your lists to quickly get back into the action!
+    
+    
+For feature requests, bug reports, donations and whatever else, you can contact me at https://temsoft.io
 
-Written in C# in Visual Studio 2017
