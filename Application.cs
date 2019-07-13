@@ -1,6 +1,7 @@
 ﻿using Gma.System.MouseKeyHook;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -16,16 +17,25 @@ namespace TemseiAutoClicker {
         Multi
     }
 
+    enum Mode {
+        Normal,
+        SingleList,
+        MultipleList,
+        None
+    }
+
     public partial class Application : Form {
 
         private MouseEventData _mouseEventData = new MouseEventData();
 
         public static List<char> activeHotkeys = new List<char>();
         private char _defaultHotkey = 'H';
+        private char _automationHotkey = 'V';
 
         private Thread _leftClickThread;
         private Thread _rightClickThread;
         private Thread _customClickThread;
+        private Thread _multipleListsThread;
 
         private bool _randomizeClickSpeed = false;
         private int _randomizationAmount;
@@ -35,15 +45,17 @@ namespace TemseiAutoClicker {
         private bool _holdRightMouseButton;
 
         private bool _registeringClickPosition = false;
-        private List<ClickPosition> clickPositions = new List<ClickPosition>();
+        private List<ClickPosition> _clickPositions = new List<ClickPosition>();
 
         public List<ClickCollection> clickCollections = new List<ClickCollection>();
+        private List<ClickCollection> _automatedClickCollections = new List<ClickCollection>();
         public static string availableLetters =  "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         private bool _isRunning = false;
 
         private IKeyboardMouseEvents _GlobalHook;
         private ClickType _clickType = ClickType.Left;
+        private Mode _mode = Mode.Normal;
 
         private bool _saveSettings = false;
         public static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
@@ -52,13 +64,17 @@ namespace TemseiAutoClicker {
         
         private bool holdCTRL = false; // Not used in the main version and will never be set to true
 
-        private Keys _activeKey;
+        private Keys _activeKey; // The key that was last pressed. Used to determine course of action in custom thread running
 
         public int ListsAtStart { get; set; }
 
         private void Run() {
             if (!IsReady()) {
                 Console.WriteLine("Not ready!");
+                return;
+            }
+            if (_isRunning) {
+                Stop();
                 return;
             }
 
@@ -90,11 +106,12 @@ namespace TemseiAutoClicker {
 
         private void RunCustomThread(char key) {
             try {
-                if (_activeKey == (Keys) key) { // shutdown thread and return if user presses the current hotkey
+                if (_activeKey == (Keys) key) { // terminate thread and return if user presses the current hotkey
                     Stop();
                     return;
                 }
-                if (_activeKey != Keys.None) { // shutdown the current thread if it exists
+
+                if (_activeKey != Keys.None) { // terminate current thread if it exists (but do not return) in preparation for starting the next one
                     Stop();
                 }
 
@@ -112,12 +129,11 @@ namespace TemseiAutoClicker {
 
                 _activeKey = (Keys) key;
 
-                CustomClickingThread customClickingThread = new CustomClickingThread
-                    (clickCollection.ClickInterval, clickCollection.SingleLoop, clickCollection.Clicks, this);
+                CustomClickingThread customClickingThread = new CustomClickingThread(clickCollection.ClickInterval, clickCollection.SingleLoop, clickCollection.Clicks);
 
-                /*if (singleLoop) {
-                    Task.Delay(TimeSpan.FromSeconds(clickPositions.Count * leftClickingSpeed)).ContinueWith(t => Stop());
-                }*/
+                if (clickCollection.SingleLoop) {
+                    customClickingThread.SingleLoopEvent += () => Invoke(new Action(() => Stop()));
+                }
 
                 _customClickThread = new Thread(new ThreadStart(customClickingThread.Run));
                 _customClickThread.Start();
@@ -126,6 +142,20 @@ namespace TemseiAutoClicker {
             } catch (Exception exc) {
                 MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
             }
+        }
+        
+        private void RunMultipleLists() {
+            if (_isRunning) {
+                Stop();
+                return;
+            }
+
+            WindowState = FormWindowState.Minimized;
+            _isRunning = true;
+
+            MultipleListsThread multipleListsThread = new MultipleListsThread(_automatedClickCollections);
+            _multipleListsThread = new Thread(new ThreadStart(multipleListsThread.Run));
+            _multipleListsThread.Start();
         }
 
         private void ShutdownThread(Thread thread) {
@@ -137,12 +167,9 @@ namespace TemseiAutoClicker {
 
         public void Stop() {
             try {
-                /*if (!_isRunning)
-                    return;*/
-
                 WindowState = FormWindowState.Normal;
 
-                Thread[] threads = { _leftClickThread, _rightClickThread, _customClickThread };
+                Thread[] threads = { _leftClickThread, _rightClickThread, _customClickThread, _multipleListsThread};
                 foreach(Thread thread in threads) {
                     ShutdownThread(thread);
                 }
@@ -161,7 +188,7 @@ namespace TemseiAutoClicker {
                 if(holdCTRL)
                     MouseEventData.keybd_event(MouseEventData.VK_CONTROL, 0, MouseEventData.KEYEVENTF_KEYUP, 0);
             } catch (ThreadAbortException ex) {
-                //MessageBox.Show("Error stopping the application - " + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine("Error terminating threads: " + ex);
             }
         }
 
@@ -183,26 +210,46 @@ namespace TemseiAutoClicker {
             comboBox3.SelectedIndex = 2;
             new Load(this, clickCollections);
             activeHotkeys.Add(_defaultHotkey);
+            activeHotkeys.Add(_automationHotkey);
         }
 
         private void PrepareRun(char key) {
-            if (_isRunning) {
-                Stop();
-                return;
-            }
-
             supportBox.Focus();
 
-            if (_defaultHotkey == key && !advancedSettingsPanel.Visible) {
-                Run();
-            } else if (activeHotkeys.Contains(key) && advancedSettingsPanel.Visible && key != _defaultHotkey) {
-                RunCustomThread(key);
+            switch(_mode) {
+                case Mode.Normal:
+                    Run();
+                    break;
+                case Mode.SingleList:
+                    RunCustomThread(key);
+                    break;
+                case Mode.MultipleList:
+                    RunMultipleLists();
+                    break;
+                default:
+                    break;
             }
         }
 
         private void GlobalHookKeyPress(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Escape && _recordingSequence) {
+                StopRecordingMouseClicks();
+            }
+
             if (ModifierKeys == Keys.Control && activeHotkeys.Contains((char) e.KeyCode)) {
+
+                if ((char) e.KeyCode == _defaultHotkey && !advancedSettingsPanel.Visible) {
+                    _mode = Mode.Normal;
+                } else if ((char) e.KeyCode == _automationHotkey && advancedSettingsPanel.Visible) {
+                    _mode = Mode.MultipleList;
+                } else if (advancedSettingsPanel.Visible) {
+                    _mode = Mode.SingleList;
+                } else {
+                    _mode = Mode.None;
+                }
+
                 PrepareRun((char) e.KeyCode);
+                
             }
         }
 
@@ -256,24 +303,58 @@ namespace TemseiAutoClicker {
             return !bCreatedNew;
         }
 
-        private void RegisterButton_Click(object sender, EventArgs e) {
-            _registeringClickPosition = true;
-            this.WindowState = FormWindowState.Minimized;
-        }
-
         private void CustomizedClicksButton_Click(object sender, EventArgs e) {
             advancedSettingsPanel.Visible = true;
         }
 
-        private void continueButton_Click(object sender, EventArgs e) {
+        private void ContinueButton_Click(object sender, EventArgs e) {
             advancedSettingsPanel.Visible = false;
         }
 
         private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e) {
-            if (!_registeringClickPosition)
+            if (!_registeringClickPosition && !_recordingSequence)
                 return;
+
             e.Handled = true;
-            RegisterNewClickPosition(new ClickPosition(e.X, e.Y, e.Button));
+            if (_registeringClickPosition) {
+                RegisterNewClickPosition(new ClickPosition(e.X, e.Y, e.Button));
+            } else {
+                RegisterClickFromSequence(new ClickPosition(e.X, e.Y, e.Button));
+            }
+        }
+
+        private bool _recordingSequence;
+        private void RegisterSequence_Click(object sender, EventArgs e) {
+            if (listBox.SelectedItem == null) {
+                MessageBox.Show("Please select the list you want to record clicks for.");
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("Press OK to start recording and hit the 'ESC' key on your keyboard when you're done.", "Continue", MessageBoxButtons.OKCancel);
+            if (result == DialogResult.OK) {
+                _recordingSequence = true;
+                WindowState = FormWindowState.Minimized;
+            }
+        }
+
+        private void RegisterClickFromSequence(ClickPosition mouseClick) {
+            if (!_recordingSequence)
+                return;
+            Draw.DrawCircle(mouseClick.X, mouseClick.Y);
+
+            ClickCollection collection = GetSelectedClickCollection();
+            collection.Clicks.Add(mouseClick);
+            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + "Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
+        }
+
+        private void StopRecordingMouseClicks() {
+            _recordingSequence = false;
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void RegisterButton_Click(object sender, EventArgs e) {
+            _registeringClickPosition = true;
+            this.WindowState = FormWindowState.Minimized;
         }
 
         private void RegisterNewClickPosition(ClickPosition mouseClick) {
@@ -283,7 +364,7 @@ namespace TemseiAutoClicker {
             ClickCollection collection = GetSelectedClickCollection();
             _registeringClickPosition = false;
             collection.Clicks.Add(mouseClick);
-            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + " Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
+            clickListBox.Items.Add(collection.Clicks.Count + ". X: " + mouseClick.X + "Y: " + mouseClick.Y + " Type: " + mouseClick.MouseButton); 
             this.WindowState = FormWindowState.Normal;
         }
 
@@ -336,7 +417,7 @@ namespace TemseiAutoClicker {
 
         private void SaveSettings() {
             if (_saveSettings) {
-                new Save(clickCollections);
+                new Save(clickCollections, _automatedClickCollections);
             }
         }
 
@@ -410,14 +491,23 @@ namespace TemseiAutoClicker {
             foreach(ClickCollection collection in clickCollections) {
                 activeHotkeys.Add(collection.Hotkey);
                 availableLetters = availableLetters.Replace(collection.Hotkey.ToString().ToUpper(), string.Empty);
-                Console.WriteLine("Registered: " + collection.Hotkey);
             }
-            
         }
 
-        public void DeleteTextBox(string name) {
+        public void InitializeAutomatedLists(List<String> listNames) {
+            foreach(string str in listNames) {
+                _automatedClickCollections.Add(FindCollectionByName(str));
+                automationListBox.Items.Add(str);
+            }
+        }
+
+        public void DeleteFromTextBox(string name) {
             int index = listBox.FindString(name);
             listBox.Items.RemoveAt(index);
+            if (automationListBox.Items.Contains(name)) {
+                automationListBox.Items.Remove(name);
+                _automatedClickCollections.Remove(FindCollectionByName(name));
+            }
         }
 
         private void listBox_SelectedIndexChanged(object sender, EventArgs e) {
@@ -428,7 +518,7 @@ namespace TemseiAutoClicker {
             clickListBox.Items.Clear();
 
             for(int i = 0; i < clicks.Count; i++) {
-                clickListBox.Items.Add((i + 1) + ". X: " + clicks[i].X + " Y: " + clicks[i].Y + " Type: " + clicks[i].MouseButton); 
+                clickListBox.Items.Add((i + 1) + ". X: " + clicks[i].X + "Y: " + clicks[i].Y + " Type: " + clicks[i].MouseButton); 
             }
         }
 
@@ -442,16 +532,29 @@ namespace TemseiAutoClicker {
         }
 
         private void clickListBox_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Delete) {
+            if (e.KeyCode == Keys.Delete && clickListBox.SelectedItem != null) {
                 ClickCollection collection = GetSelectedClickCollection();
+                if (collection == null)
+                    return;
+
                 string str = clickListBox.SelectedItem.ToString();
-                string index = str[0].ToString();
+                int X = Convert.ToInt32(Utility.GetStringBetweenIndexes(str, str.IndexOf("X") + 2, str.IndexOf("Y") - 1));
+                int Y = Convert.ToInt32(Utility.GetStringBetweenIndexes(str, str.IndexOf("Y") + 2, str.IndexOf("T") - 1));
 
                 clickListBox.Items.Remove(clickListBox.SelectedItem);
-                collection.Clicks.RemoveAt(Convert.ToInt32(index) - 1);
+                collection.Clicks.Remove(GetClickPositionByCoordinates(X, Y));
 
                 e.Handled = true;
             }
+        }
+
+        private ClickPosition GetClickPositionByCoordinates(int x, int y) {
+            foreach(ClickPosition click in GetSelectedClickCollection().Clicks) {
+                if (click.X == x && click.Y == y) {
+                    return click;
+                }
+            }
+            return null;
         }
 
         private void twitterLogo_Click(object sender, EventArgs e) {
@@ -476,6 +579,55 @@ namespace TemseiAutoClicker {
             _holdRightMouseButton = !_holdRightMouseButton;
             clickIntervalsGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
             clickRandomizationGroupBox.Enabled = (_holdLeftMouseButton || _holdRightMouseButton) ? false : true;
+        }
+
+        private void automateListButton_Click(object sender, EventArgs e) {
+            if (GetSelectedClickCollection() == null) {
+                MessageBox.Show("Please select a list to automate.");
+                return;
+            }
+
+            ClickCollection clickCollection = GetSelectedClickCollection();
+
+            if (_automatedClickCollections.Contains(clickCollection)) {
+                MessageBox.Show("You've already automated this list!");
+                return;
+            }
+
+            if (clickCollection.SingleLoop) {
+                MessageBox.Show("Please toggle off your lists 'SingleLoop' setting before automating it.");
+                return;
+            }
+            
+            _automatedClickCollections.Add(clickCollection);
+            automationListBox.Items.Add(clickCollection.Name);
+        }
+
+        private void automationHotkey_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyValue >= 0x41 && e.KeyValue <= 0x5A) { // Letters only
+                if (activeHotkeys.Contains((char) e.KeyCode)) {
+                    MessageBox.Show("The hotkey '" + e.KeyCode + "' is already in use.");
+                    return;
+                }
+                automationTextBox.Text = "CTRL + " + e.KeyCode.ToString();
+                activeHotkeys.Remove(_defaultHotkey);
+                _defaultHotkey = (char) e.KeyCode;
+                activeHotkeys.Add(_defaultHotkey);
+            }
+        }
+
+        private void automationListBox_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Delete && automationListBox.SelectedItem != null) {
+                string str = automationListBox.SelectedItem.ToString();
+                string index = str[0].ToString();
+
+                ClickCollection collection = FindCollectionByName(str);
+
+                automationListBox.Items.Remove(automationListBox.SelectedItem);
+                _automatedClickCollections.Remove(collection);
+
+                e.Handled = true;
+            }
         }
     }
 }

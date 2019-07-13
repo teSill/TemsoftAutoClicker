@@ -78,6 +78,7 @@
     <Compile Include="ClickCollection.cs" />
     <Compile Include="ClickPosition.cs" />
     <Compile Include="CustomClickingThread.cs" />
+    <Compile Include="Draw.cs" />
     <Compile Include="LeftClickingThread.cs" />
     <Compile Include="ListEditForm.cs">
       <SubType>Form</SubType>
@@ -87,6 +88,7 @@
     </Compile>
     <Compile Include="Load.cs" />
     <Compile Include="MouseEventData.cs" />
+    <Compile Include="MultipleListsThread.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

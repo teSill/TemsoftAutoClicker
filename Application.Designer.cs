@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.automationListBox = new System.Windows.Forms.ListBox();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -35,15 +36,20 @@
             this.label4 = new System.Windows.Forms.Label();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.advancedSettingsPanel = new System.Windows.Forms.Panel();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.automationTextBox = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.continueButton = new System.Windows.Forms.Button();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.clickListBox = new System.Windows.Forms.ListBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
@@ -67,6 +73,8 @@
             this.holdRightCheckBox = new System.Windows.Forms.CheckBox();
             this.holdLeftCheckBox = new System.Windows.Forms.CheckBox();
             this.advancedSettingsPanel.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.groupBox12.SuspendLayout();
             this.groupBox11.SuspendLayout();
             this.groupBox10.SuspendLayout();
@@ -85,6 +93,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.twitterLogo)).BeginInit();
             this.groupBox13.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // automationListBox
+            // 
+            this.automationListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.automationListBox.FormattingEnabled = true;
+            this.automationListBox.Location = new System.Drawing.Point(3, 16);
+            this.automationListBox.Name = "automationListBox";
+            this.automationListBox.Size = new System.Drawing.Size(204, 44);
+            this.automationListBox.TabIndex = 0;
+            this.automationListBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.automationListBox_KeyDown);
             // 
             // radioButton1
             // 
@@ -246,6 +264,8 @@
             // 
             // advancedSettingsPanel
             // 
+            this.advancedSettingsPanel.Controls.Add(this.groupBox3);
+            this.advancedSettingsPanel.Controls.Add(this.groupBox2);
             this.advancedSettingsPanel.Controls.Add(this.groupBox12);
             this.advancedSettingsPanel.Controls.Add(this.groupBox11);
             this.advancedSettingsPanel.Controls.Add(this.groupBox10);
@@ -253,49 +273,80 @@
             this.advancedSettingsPanel.Controls.Add(this.groupBox8);
             this.advancedSettingsPanel.Controls.Add(this.groupBox7);
             this.advancedSettingsPanel.Controls.Add(this.groupBox6);
-            this.advancedSettingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.advancedSettingsPanel.Location = new System.Drawing.Point(0, 0);
             this.advancedSettingsPanel.Name = "advancedSettingsPanel";
-            this.advancedSettingsPanel.Size = new System.Drawing.Size(448, 318);
+            this.advancedSettingsPanel.Size = new System.Drawing.Size(444, 318);
             this.advancedSettingsPanel.TabIndex = 2;
             this.advancedSettingsPanel.Visible = false;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.automationTextBox);
+            this.groupBox3.Location = new System.Drawing.Point(228, 252);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(116, 63);
+            this.groupBox3.TabIndex = 17;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Automation Hotkey";
+            // 
+            // automationTextBox
+            // 
+            this.automationTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.automationTextBox.Location = new System.Drawing.Point(7, 22);
+            this.automationTextBox.Name = "automationTextBox";
+            this.automationTextBox.ReadOnly = true;
+            this.automationTextBox.Size = new System.Drawing.Size(100, 26);
+            this.automationTextBox.TabIndex = 0;
+            this.automationTextBox.Text = "CTRL + V";
+            this.automationTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.automationTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.automationHotkey_KeyDown);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.automationListBox);
+            this.groupBox2.Location = new System.Drawing.Point(12, 252);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(210, 63);
+            this.groupBox2.TabIndex = 16;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Lists Here Will Auto. Run In Order";
             // 
             // groupBox12
             // 
             this.groupBox12.Controls.Add(this.continueButton);
-            this.groupBox12.Location = new System.Drawing.Point(338, 185);
+            this.groupBox12.Location = new System.Drawing.Point(348, 252);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(103, 63);
+            this.groupBox12.Size = new System.Drawing.Size(92, 63);
             this.groupBox12.TabIndex = 15;
             this.groupBox12.TabStop = false;
-            this.groupBox12.Text = "Return To Start";
+            this.groupBox12.Text = "Main Menu";
             // 
             // continueButton
             // 
             this.continueButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.continueButton.Location = new System.Drawing.Point(10, 18);
+            this.continueButton.Location = new System.Drawing.Point(4, 21);
             this.continueButton.Name = "continueButton";
             this.continueButton.Size = new System.Drawing.Size(84, 31);
             this.continueButton.TabIndex = 3;
             this.continueButton.Text = "Return";
             this.continueButton.UseVisualStyleBackColor = true;
-            this.continueButton.Click += new System.EventHandler(this.continueButton_Click);
+            this.continueButton.Click += new System.EventHandler(this.ContinueButton_Click);
             // 
             // groupBox11
             // 
             this.groupBox11.Controls.Add(this.checkBox3);
-            this.groupBox11.Location = new System.Drawing.Point(215, 185);
+            this.groupBox11.Location = new System.Drawing.Point(348, 184);
             this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(117, 63);
+            this.groupBox11.Size = new System.Drawing.Size(93, 61);
             this.groupBox11.TabIndex = 15;
             this.groupBox11.TabStop = false;
-            this.groupBox11.Text = "Save Lists On Exit?";
+            this.groupBox11.Text = "Save Lists?";
             // 
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
             this.checkBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.checkBox3.Location = new System.Drawing.Point(29, 25);
+            this.checkBox3.Location = new System.Drawing.Point(11, 23);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(64, 24);
             this.checkBox3.TabIndex = 6;
@@ -305,22 +356,34 @@
             // 
             // groupBox10
             // 
+            this.groupBox10.Controls.Add(this.button3);
             this.groupBox10.Controls.Add(this.button5);
             this.groupBox10.Location = new System.Drawing.Point(348, 66);
             this.groupBox10.Name = "groupBox10";
             this.groupBox10.Size = new System.Drawing.Size(92, 112);
             this.groupBox10.TabIndex = 14;
             this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "Registration";
+            this.groupBox10.Text = "Register Clicks";
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.button3.Location = new System.Drawing.Point(6, 61);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(80, 45);
+            this.button3.TabIndex = 1;
+            this.button3.Text = "Record Sequence";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.RegisterSequence_Click);
             // 
             // button5
             // 
-            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(6, 41);
+            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.button5.Location = new System.Drawing.Point(6, 14);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(80, 29);
+            this.button5.Size = new System.Drawing.Size(80, 45);
             this.button5.TabIndex = 0;
-            this.button5.Text = "Register";
+            this.button5.Text = "Single Click";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.RegisterButton_Click);
             // 
@@ -345,14 +408,26 @@
             // 
             // groupBox8
             // 
+            this.groupBox8.Controls.Add(this.button2);
             this.groupBox8.Controls.Add(this.button1);
             this.groupBox8.Controls.Add(this.button6);
-            this.groupBox8.Location = new System.Drawing.Point(12, 185);
+            this.groupBox8.Location = new System.Drawing.Point(12, 184);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(197, 63);
+            this.groupBox8.Size = new System.Drawing.Size(332, 62);
             this.groupBox8.TabIndex = 9;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "List Modification";
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F);
+            this.button2.Location = new System.Drawing.Point(229, 19);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(84, 30);
+            this.button2.TabIndex = 11;
+            this.button2.Text = "Automate";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.automateListButton_Click);
             // 
             // button1
             // 
@@ -368,7 +443,7 @@
             // button6
             // 
             this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F);
-            this.button6.Location = new System.Drawing.Point(100, 19);
+            this.button6.Location = new System.Drawing.Point(120, 19);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(80, 30);
             this.button6.TabIndex = 10;
@@ -416,8 +491,8 @@
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(369, 37);
             this.textBox2.TabIndex = 2;
-            this.textBox2.Text = "Add and customize lists for the program to iterate through. Use the \'Register\' bu" +
-    "tton to add new clicks to the currently selected list.";
+            this.textBox2.Text = "Add and customize lists for the program to iterate through. Click a registration " +
+    "button to add new clicks to the currently selected list.";
             this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // advancedSettingsButton
@@ -624,6 +699,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Application_FormClosing);
             this.Load += new System.EventHandler(this.Application_Load);
             this.advancedSettingsPanel.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.groupBox12.ResumeLayout(false);
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
@@ -667,7 +745,6 @@
         private System.Windows.Forms.Panel advancedSettingsPanel;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button advancedSettingsButton;
-        private System.Windows.Forms.Button continueButton;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.ListBox clickListBox;
         private System.Windows.Forms.CheckBox checkBox3;
@@ -692,10 +769,17 @@
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.GroupBox groupBox10;
         private System.Windows.Forms.GroupBox groupBox11;
-        private System.Windows.Forms.GroupBox groupBox12;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.CheckBox holdRightCheckBox;
         private System.Windows.Forms.CheckBox holdLeftCheckBox;
+        private System.Windows.Forms.GroupBox groupBox12;
+        private System.Windows.Forms.Button continueButton;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox automationTextBox;
+        private System.Windows.Forms.ListBox automationListBox;
+        private System.Windows.Forms.Button button3;
     }
 }
 

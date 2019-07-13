@@ -13,9 +13,7 @@ namespace TemseiAutoClicker {
         public char Hotkey { get; private set; }
         public float ClickInterval { get; private set; }
 
-        public ClickCollection() {
-
-        }
+        public string SavedName { get; set; } // The name the file was saved and loaded as. Use this to delete previous versions of the file
 
         public ClickCollection(List<ClickPosition> clicks, string name, bool singleLoop, char hotkey, float clickSpeed) {
             Clicks = clicks;

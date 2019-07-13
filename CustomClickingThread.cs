@@ -15,54 +15,37 @@ namespace TemseiAutoClicker {
         private float _clickInterval;
         private bool _singleLoop;
         private List<ClickPosition> _clickPositions;
-        private Application _application;
 
-        public CustomClickingThread(float clickInterval, bool singleLoop, 
-            List<ClickPosition> clickPositions, Application application) {
+        public event Action SingleLoopEvent;
+
+        public CustomClickingThread(float clickInterval, bool singleLoop, List<ClickPosition> clickPositions) {
             _clickInterval = clickInterval;
             _singleLoop = singleLoop;
             _clickPositions = clickPositions;
-            _application = application;
         }
 
         public void Run() {
+            int count = 0;
             try {
                 while(true) {
                     foreach(ClickPosition click in _clickPositions) {
-                        //mouseEvents.ClickCustomPositionEvent(click.X, click.Y, click.MouseButton);
-                        LinearSmoothMove(new Point(click.X, click.Y), 5, 10, click.MouseButton);
-                        
-                        Thread.Sleep((int) (_clickInterval * 1000));
+                        count++;
+                        MouseEventData.LinearSmoothMove(new Point(click.X, click.Y), 5, 10, click.MouseButton);
+
+                        if (count < _clickPositions.Count) {
+                            Thread.Sleep((int) (_clickInterval * 1000));
+                        }
+                    }
+
+                    var success = SingleLoopEvent;
+                    if (success != null) {
+                        success();
+                        break;
                     }
                 }
-               // if (singleLoop)
-                    //application.Stop();
             } catch (Exception exc){
                 //MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        public void LinearSmoothMove(Point newPosition, int steps, int sleepTime, MouseButtons mouseButton) {
-            Point start = new Point(Cursor.Position.X, Cursor.Position.Y);
-            PointF iterPoint = start;
-
-            // Find the slope of the line segment defined by start and newPosition
-            PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
-
-            // Divide by the number of steps
-            slope.X = slope.X / steps;
-            slope.Y = slope.Y / steps;
-
-            // Move the mouse to each iterative point.
-            for (int i = 0; i < steps; i++) {
-                iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
-                Cursor.Position = Point.Round(iterPoint);
-                Thread.Sleep(sleepTime);
-            }
-
-            // Move the mouse to the final destination.
-            Cursor.Position = newPosition;
-            mouseEvents.ClickCurrentPositionEvent(mouseButton);
         }
     }
 }

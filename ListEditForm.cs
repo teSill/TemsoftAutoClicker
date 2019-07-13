@@ -83,14 +83,13 @@ namespace TemseiAutoClicker {
             } catch(IOException ioe) {
                 Console.WriteLine(ioe.Message);
             }
-
             
             Application.availableLetters += clickCollection.Hotkey.ToString();
             Application.activeHotkeys.Add(clickCollection.Hotkey);
             Console.WriteLine("Added " + clickCollection.Hotkey + " to the list.");
             _application.clickCollections.Remove(clickCollection);
 
-            _application.DeleteTextBox(_updatedListName);
+            _application.DeleteFromTextBox(_updatedListName);
             _application.listEditFormIsOpen = false;
             Hide();
         }

@@ -46,7 +46,7 @@ namespace TemseiAutoClicker {
             mouse_event((button == "left") ? MOUSEEVENTF_LEFTUP : MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
         }
 
-        public void ClickCurrentPositionEvent(MouseButtons mouseButton) {
+        public static void ClickCurrentPositionEvent(MouseButtons mouseButton) {
             mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
@@ -61,6 +61,29 @@ namespace TemseiAutoClicker {
             double max = defaultSpeed / multiplier;
 
             return random.NextDouble() * (max - min) + min;
+        }
+
+        public static void LinearSmoothMove(Point newPosition, int steps, int sleepTime, MouseButtons mouseButton) {
+            Point start = new Point(Cursor.Position.X, Cursor.Position.Y);
+            PointF iterPoint = start;
+
+            // Find the slope of the line segment defined by start and newPosition
+            PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
+
+            // Divide by the number of steps
+            slope.X = slope.X / steps;
+            slope.Y = slope.Y / steps;
+
+            // Move the mouse to each iterative point.
+            for (int i = 0; i < steps; i++) {
+                iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
+                Cursor.Position = Point.Round(iterPoint);
+                Thread.Sleep(sleepTime);
+            }
+
+            // Move the mouse to the final destination.
+            Cursor.Position = newPosition;
+            ClickCurrentPositionEvent(mouseButton);
         }
     }
 }

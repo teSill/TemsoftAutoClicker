@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TemseiAutoClicker {
-    class Utility {
+    static class Utility {
 
         static Random random = new Random();
 
@@ -17,6 +17,10 @@ namespace TemseiAutoClicker {
             finalString = @string.Substring(Pos1, Pos2 - Pos1);
 
             return finalString;
+        }
+
+        public static string GetStringBetweenIndexes(string @string , int firstIndex, int secondIndex) {
+            return @string.Substring(firstIndex, secondIndex - firstIndex);
         }
 
         public static char GetRandomLetter() {
@@ -35,6 +39,18 @@ namespace TemseiAutoClicker {
             }
 
             return new String(stringChars);
+        }
+
+        public static string GetUntilOrEmpty(this string text, string stopAt = ".") {
+            if (!String.IsNullOrWhiteSpace(text)) { 
+                int charLocation = text.IndexOf(stopAt, StringComparison.Ordinal);
+
+                if (charLocation > 0) {
+                    return text.Substring(0, charLocation);
+                }
+            }
+
+            return String.Empty;
         }
 
     }

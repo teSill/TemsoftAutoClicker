@@ -17,6 +17,7 @@ namespace TemseiAutoClicker {
             _application = application;
             _clickCollections = clickCollections;
             LoadSettings();
+            LoadAutomatedLists();
         }
 
         private void LoadSettings() {
@@ -24,9 +25,13 @@ namespace TemseiAutoClicker {
                 return;
 
             foreach(string file in Directory.EnumerateFiles(Application.FolderPath, "*.txt")) {
+                if (file.Contains("AutomatedLists")) {
+                    continue;
+                }
                 string[] contents = File.ReadAllLines(file);
                 string fileName = Path.GetFileName(file).Substring(0, Path.GetFileName(file).Length -4);
                 ClickCollection clickCollection = ConvertFileContentIntoCollection(contents, fileName);
+                clickCollection.SavedName = clickCollection.Name;
                 _application.clickCollections.Add(clickCollection);
                 
             }
@@ -73,6 +78,17 @@ namespace TemseiAutoClicker {
 
             return new ClickCollection(clicks, collectionName, singleLoop, hotkey, clickInterval);
 
+        }
+
+        private void LoadAutomatedLists() {
+            List<string> listNames = new List<string>();
+            using(StreamReader sr = File.OpenText(Path.Combine(Application.FolderPath, "AutomatedLists.txt"))) {
+                string str = "";
+                while((str = sr.ReadLine()) != null) {
+                    listNames.Add(str);
+                }
+            }
+            _application.InitializeAutomatedLists(listNames);
         }
 
         private ClickPosition ConvertStringToPosition(string line) {

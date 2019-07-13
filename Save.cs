@@ -9,24 +9,39 @@ using System.Windows.Forms;
 namespace TemseiAutoClicker {
     class Save {
 
-        private List<ClickCollection> collections;
+        private List<ClickCollection> _collections;
+        private List<ClickCollection> _automatedCollections;
 
-        public Save(List<ClickCollection> collections) {
-            this.collections = collections;
+        public Save(List<ClickCollection> collections, List<ClickCollection> automatedCollections) {
+            _collections = collections;
+            _automatedCollections = automatedCollections;
             SaveFile();
+            SaveAutomatedLists();
         }
 
-        public void SaveFile() {
+        private void SaveFile() {
             if (!Directory.Exists(Application.FolderPath)) {
                 Directory.CreateDirectory(Application.FolderPath);
             }
 
             try {
-                foreach(ClickCollection collection in collections) {
+                foreach(ClickCollection collection in _collections) {
+                    string savedPreviousFile = Path.Combine(Application.FolderPath, collection.SavedName + ".txt");
+                    if (File.Exists(savedPreviousFile) && savedPreviousFile != collection.Name) {
+                        File.Delete(savedPreviousFile);
+                    }
                     File.WriteAllText(Path.Combine(Application.FolderPath, collection.Name + ".txt"), ConvertDataToString(collection));
                 }
             } catch (Exception e) {
                 System.Diagnostics.Debug.Write(e);
+            }
+        }
+
+        private void SaveAutomatedLists() {
+            using(StreamWriter sw = File.CreateText(Path.Combine(Application.FolderPath, "AutomatedLists.txt"))) {
+                foreach(ClickCollection collection in _automatedCollections) {
+                    sw.WriteLine(collection.Name);
+                }
             }
         }
 
@@ -42,7 +57,6 @@ namespace TemseiAutoClicker {
             for(int i = 0; i < collection.Clicks.Count; i++) {
                 contents += collection.Clicks[i].X + "," + collection.Clicks[i].Y + "-" +  collection.Clicks[i].MouseButton + Environment.NewLine;
             }
-
             return contents;
         }
     }
