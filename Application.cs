@@ -234,6 +234,10 @@ namespace TemseiAutoClicker {
             if (e.KeyCode == Keys.Escape && _recordingSequence) {
                 StopRecordingMouseClicks();
             }
+            if ((e.KeyCode == Keys.Escape) && _isRunning || _activeKey != Keys.None) {
+                Stop();
+                return;
+            }
 
             if (ModifierKeys == Keys.Control && activeHotkeys.Contains((char) e.KeyCode)) {
 
