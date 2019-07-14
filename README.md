@@ -2,11 +2,11 @@
 
 Direct download to the executable can be found here: https://github.com/teSill/TemseiAutoClicker/raw/master/bin/Release/TemseiAutoClicker.exe
 
-![image_1](http://temsoft.io/temsoft_assets/AutoClicker1.png)
+![image_1](http://temsoft.io/temsoft_assets/AutoClickerImage1.png)
 
-![image_2](http://temsoft.io/temsoft_assets/AutoClicker2.png)
+![image_2](http://temsoft.io/temsoft_assets/AutoClickerImage2.png)
 
-![image_3](http://temsoft.io/temsoft_assets/AutoClicker3.png)
+![image_3](http://temsoft.io/temsoft_assets/AutoClickerImage3.png)
 
 Temsei Auto Clicker is a reliable lightweight auto clicker that can be used to complete both traditionally simple left and right click operations, but also set-up to perform infinitely complex click sequences. 
 
