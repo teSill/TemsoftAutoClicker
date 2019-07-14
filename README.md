@@ -26,5 +26,8 @@ Main Features
     - Save and load your lists to quickly get back into the action!
     
     
+Advanced settings quick guide/demonstration:
+https://www.youtube.com/watch?v=z3Oa4QU3OUU
+    
 For feature requests, bug reports, donations and whatever else, you can contact me at https://temsoft.io
 
