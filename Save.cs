@@ -20,17 +20,17 @@ namespace TemseiAutoClicker {
         }
 
         private void SaveFile() {
-            if (!Directory.Exists(Application.FolderPath)) {
-                Directory.CreateDirectory(Application.FolderPath);
+            if (!Directory.Exists(Application.FOLDER_PATH)) {
+                Directory.CreateDirectory(Application.FOLDER_PATH);
             }
 
             try {
                 foreach(ClickCollection collection in _collections) {
-                    string savedPreviousFile = Path.Combine(Application.FolderPath, collection.SavedName + ".txt");
+                    string savedPreviousFile = Path.Combine(Application.FOLDER_PATH, collection.SavedName + ".txt");
                     if (File.Exists(savedPreviousFile) && savedPreviousFile != collection.Name) {
                         File.Delete(savedPreviousFile);
                     }
-                    File.WriteAllText(Path.Combine(Application.FolderPath, collection.Name + ".txt"), ConvertDataToString(collection));
+                    File.WriteAllText(Path.Combine(Application.FOLDER_PATH, collection.Name + ".txt"), ConvertDataToString(collection));
                 }
             } catch (Exception e) {
                 System.Diagnostics.Debug.Write(e);
@@ -38,7 +38,7 @@ namespace TemseiAutoClicker {
         }
 
         private void SaveAutomatedLists() {
-            using(StreamWriter sw = File.CreateText(Path.Combine(Application.FolderPath, "AutomatedLists.txt"))) {
+            using(StreamWriter sw = File.CreateText(Path.Combine(Application.FOLDER_PATH, "AutomatedLists.txt"))) {
                 foreach(ClickCollection collection in _automatedCollections) {
                     sw.WriteLine(collection.Name);
                 }

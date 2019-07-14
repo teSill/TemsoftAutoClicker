@@ -72,9 +72,9 @@ namespace TemseiAutoClicker {
 
         private void DeleteButtonClick(object sender, EventArgs e) {
             ClickCollection clickCollection = _application.FindCollectionByName(_updatedListName);
-            string filePath = Path.Combine(Application.FolderPath, clickCollection.Name + ".txt");
+            string filePath = Path.Combine(Application.FOLDER_PATH, clickCollection.Name + ".txt");
             try {
-                if (Directory.Exists(Application.FolderPath)) {
+                if (Directory.Exists(Application.FOLDER_PATH)) {
                 
                     if (File.Exists(filePath)) {
                         File.Delete(filePath);

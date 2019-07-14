@@ -297,7 +297,7 @@
             this.automationTextBox.ReadOnly = true;
             this.automationTextBox.Size = new System.Drawing.Size(100, 26);
             this.automationTextBox.TabIndex = 0;
-            this.automationTextBox.Text = "CTRL + V";
+            this.automationTextBox.Text = "CTRL + B";
             this.automationTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.automationTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.automationHotkey_KeyDown);
             // 
@@ -697,7 +697,7 @@
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "Application";
-            this.Text = "Temsei Auto Clicker";
+            this.Text = "Temsoft Auto Clicker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Application_FormClosing);
             this.Load += new System.EventHandler(this.Application_Load);
             this.advancedSettingsPanel.ResumeLayout(false);

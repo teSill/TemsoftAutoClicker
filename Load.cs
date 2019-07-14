@@ -21,10 +21,10 @@ namespace TemseiAutoClicker {
         }
 
         private void LoadSettings() {
-            if (!Directory.Exists(Application.FolderPath))
+            if (!Directory.Exists(Application.FOLDER_PATH))
                 return;
 
-            foreach(string file in Directory.EnumerateFiles(Application.FolderPath, "*.txt")) {
+            foreach(string file in Directory.EnumerateFiles(Application.FOLDER_PATH, "*.txt")) {
                 if (file.Contains("AutomatedLists")) {
                     continue;
                 }
@@ -81,7 +81,7 @@ namespace TemseiAutoClicker {
         }
 
         private void LoadAutomatedLists() {
-            string path = Path.Combine(Application.FolderPath, "AutomatedLists.txt");
+            string path = Path.Combine(Application.FOLDER_PATH, "AutomatedLists.txt");
             if (!File.Exists(path))
                 return;
 

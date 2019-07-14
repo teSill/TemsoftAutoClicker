@@ -30,7 +30,7 @@ namespace TemseiAutoClicker {
 
         public static List<char> activeHotkeys = new List<char>();
         private char _defaultHotkey = 'H';
-        private char _automationHotkey = 'V';
+        private char _automationHotkey = 'B';
 
         private Thread _leftClickThread;
         private Thread _rightClickThread;
@@ -59,7 +59,7 @@ namespace TemseiAutoClicker {
 
         public int ListsAtStart { get; set; }
         private bool _saveSettings = false;
-        public static readonly string FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
+        public static readonly string FOLDER_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TemseiAutoClicker");
 
         public bool listEditFormIsOpen = false;
         
@@ -144,6 +144,9 @@ namespace TemseiAutoClicker {
         }
         
         private void RunMultipleLists() {
+            if (_automatedClickCollections.Count <= 0)
+                return;
+
             if (_isRunning) {
                 Stop();
                 return;
@@ -234,7 +237,8 @@ namespace TemseiAutoClicker {
             if (e.KeyCode == Keys.Escape && _recordingSequence) {
                 StopRecordingMouseClicks();
             }
-            if ((e.KeyCode == Keys.Escape) && _isRunning || _activeKey != Keys.None) {
+
+            if (e.KeyCode == Keys.Escape && _isRunning || e.KeyCode == Keys.Escape && _activeKey != Keys.None) {
                 Stop();
                 return;
             }
@@ -344,7 +348,7 @@ namespace TemseiAutoClicker {
         private void RegisterClickFromSequence(ClickPosition mouseClick) {
             if (!_recordingSequence)
                 return;
-            Draw.DrawCircle(mouseClick.X, mouseClick.Y);
+            //Draw.DrawCircle(mouseClick.X, mouseClick.Y);
 
             ClickCollection collection = GetSelectedClickCollection();
             collection.Clicks.Add(mouseClick);
