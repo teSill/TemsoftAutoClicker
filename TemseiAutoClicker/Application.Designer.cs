@@ -584,7 +584,7 @@
             // 
             // githubLogo
             // 
-            this.githubLogo.Image = global::TemseiAutoClicker.Properties.Resources.GitHubLogo;
+            this.githubLogo.Image = global::TemsoftAutoClicker.Properties.Resources.GitHubLogo;
             this.githubLogo.Location = new System.Drawing.Point(10, 95);
             this.githubLogo.Name = "githubLogo";
             this.githubLogo.Size = new System.Drawing.Size(28, 28);
@@ -594,7 +594,7 @@
             // 
             // facebookLogo
             // 
-            this.facebookLogo.Image = global::TemseiAutoClicker.Properties.Resources.FacebookLogo;
+            this.facebookLogo.Image = global::TemsoftAutoClicker.Properties.Resources.FacebookLogo;
             this.facebookLogo.Location = new System.Drawing.Point(10, 61);
             this.facebookLogo.Name = "facebookLogo";
             this.facebookLogo.Size = new System.Drawing.Size(28, 28);
@@ -637,7 +637,7 @@
             // 
             // twitterLogo
             // 
-            this.twitterLogo.Image = global::TemseiAutoClicker.Properties.Resources.TwitterLogo;
+            this.twitterLogo.Image = global::TemsoftAutoClicker.Properties.Resources.TwitterLogo;
             this.twitterLogo.Location = new System.Drawing.Point(10, 27);
             this.twitterLogo.Name = "twitterLogo";
             this.twitterLogo.Size = new System.Drawing.Size(28, 28);
@@ -697,6 +697,7 @@
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "Application";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Temsoft Auto Clicker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Application_FormClosing);
             this.Load += new System.EventHandler(this.Application_Load);

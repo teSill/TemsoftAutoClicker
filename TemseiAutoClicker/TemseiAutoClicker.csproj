@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B83DE5E9-28AD-46B3-884C-04A2D9C28F45}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TemseiAutoClicker</RootNamespace>
-    <AssemblyName>TemseiAutoClicker</AssemblyName>
+    <RootNamespace>TemsoftAutoClicker</RootNamespace>
+    <AssemblyName>TemsoftAutoClicker</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
